@@ -1,6 +1,10 @@
 # 🩺 EffNet-SVM: Diabetic Retinopathy Detection & Explainable AI Dashboard
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge.svg)](https://effnet-svm-dr.streamlit.app/)
+
 An advanced medical decision support tool that utilizes a hybrid **EfficientNetV2-S + Support Vector Machine (SVM)** model to classify and explain the presence of **Diabetic Retinopathy (DR)** from retinal fundus photographs. 
+
+> 🔗 **Live Web Application**: Access the live clinical workstation console here: [effnet-svm-dr.streamlit.app](https://effnet-svm-dr.streamlit.app/)
 
 The application is built with a modular, scalable architecture and features dual-layered **Explainable AI (XAI)** utilizing both **Grad-CAM** and **LIME** to build trust and provide visual interpretability for clinicians.
 
@@ -196,3 +200,23 @@ git branch -M main
 # Push the code to GitHub
 git push -u origin main
 ```
+
+---
+
+## 📬 Secure Contact & Feedback System Setup
+
+The workstation includes a contact form in the sidebar that allows users to send messages directly to your email without exposing your personal email address in the codebase or UI. 
+
+This relies on **Web3Forms** and Streamlit's secure secrets management:
+
+1. **Get an Access Key**: Go to [web3forms.com](https://web3forms.com/), enter your email, and receive your free public access token in your inbox.
+2. **Local Configuration**: Create a file named `.streamlit/secrets.toml` at the root of the project:
+   ```toml
+   web3forms_access_key = "your-web3forms-access-key-here"
+   ```
+   *(Note: `.streamlit/*secrets.toml` is already added to `.gitignore` to prevent committing your key to public repositories).*
+3. **Cloud Deployment Configuration**:
+   * Go to your **Streamlit Community Cloud Dashboard**.
+   * Click **Settings** next to your app.
+   * Navigate to **Secrets** and paste the same configuration snippet there.
+

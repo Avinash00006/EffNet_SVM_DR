@@ -9,6 +9,7 @@ from skimage.segmentation import mark_boundaries
 # Import modular components
 from src.preprocessing import preprocess_fundus_image, transform, validate_fundus_image
 from src.model_inference import load_models, ExplanationEngine
+from src.contact import send_contact_message
 
 #---------------Streamlit UI Page Settings---------------------------------------------
 st.set_page_config(
@@ -115,6 +116,45 @@ with st.sidebar:
                 validation_error = validation_msg
         except Exception as e:
             validation_error = f"Failed to parse image file: {str(e)}"
+            
+    st.markdown("---")
+    st.subheader("📬 Developer & Support")
+    
+    # Custom HTML for social links (styled with clean CSS badges)
+    st.markdown(
+        """
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <a href="https://github.com/Avinash00006" target="_blank" style="text-decoration: none; color: inherit; background-color: rgba(128,128,128,0.1); border: 1px solid rgba(128,128,128,0.18); padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; cursor: pointer;">
+                🐙 GitHub
+            </a>
+            <a href="https://linkedin.com/in/avinash-koneti" target="_blank" style="text-decoration: none; color: inherit; background-color: rgba(128,128,128,0.1); border: 1px solid rgba(128,128,128,0.18); padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; cursor: pointer;">
+                🔗 LinkedIn
+            </a>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    with st.expander("✉️ Contact Developer"):
+        contact_name = st.text_input("Name", placeholder="Your Name", label_visibility="collapsed", key="contact_name")
+        contact_email = st.text_input("Email", placeholder="Your Email", label_visibility="collapsed", key="contact_email")
+        contact_msg = st.text_area("Message", placeholder="Type your message...", label_visibility="collapsed", key="contact_msg")
+        
+        if st.button("Send Message", use_container_width=True, key="btn_send_contact"):
+            if not contact_name.strip() or not contact_email.strip() or not contact_msg.strip():
+                st.error("Please fill in all fields.")
+            else:
+                with st.spinner("Delivering message..."):
+                    success, response_msg = send_contact_message(
+                        contact_name.strip(),
+                        contact_email.strip(),
+                        contact_msg.strip()
+                    )
+                if success:
+                    st.success("Sent!")
+                    st.toast("Message sent successfully!", icon="✉️")
+                else:
+                    st.error(f"Error: {response_msg}")
             
 
 #---------------Main Canvas Layout------------------------------------------------------
