@@ -20,7 +20,7 @@ def send_contact_message(name, email, message):
     }
     
     try:
-        response = requests.post("https://api.web3forms.com/submit", json=payload, timeout=12)
+        response = requests.post("https://api.web3forms.com/submit", data=payload, timeout=12)
         if response.status_code == 200:
             res_json = response.json()
             if res_json.get("success", False):
