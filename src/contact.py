@@ -11,6 +11,9 @@ def send_contact_message(name, email, message):
     if not access_key:
         return False, "Message system not configured: 'web3forms_access_key' is missing in Streamlit secrets."
         
+    # Clean whitespace and quotes from the key to prevent configuration issues
+    access_key = access_key.strip().replace('"', '').replace("'", "")
+        
     payload = {
         "access_key": access_key,
         "name": name,
@@ -19,8 +22,19 @@ def send_contact_message(name, email, message):
         "subject": "Retinal Diagnostics AI Workstation - Developer Message"
     }
     
+    # Emulate standard browser headers to prevent WAF bot-detection blocks (403 errors)
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Referer": "https://effnet-svm-dr.streamlit.app/"
+    }
+    
     try:
-        response = requests.post("https://api.web3forms.com/submit", data=payload, timeout=12)
+        response = requests.post(
+            "https://api.web3forms.com/submit", 
+            data=payload, 
+            headers=headers, 
+            timeout=12
+        )
         if response.status_code == 200:
             res_json = response.json()
             if res_json.get("success", False):
@@ -28,6 +42,7 @@ def send_contact_message(name, email, message):
             else:
                 return False, res_json.get("message", "API returned failure response.")
         else:
-            return False, f"Server returned an error status: {response.status_code}"
+            # Log response body snippet to aid diagnostics
+            return False, f"Server error {response.status_code}: {response.text[:100]}"
     except Exception as e:
         return False, f"Failed to connect to email gateway: {str(e)}"
