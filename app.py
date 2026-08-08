@@ -78,6 +78,12 @@ st.markdown("""
             display: none !important;
         }
         
+        /* Hide the "Press Enter to apply" instruction overlays from inputs */
+        div[data-testid="InputInstructions"] {
+            display: none !important;
+        }
+
+        
         /* Custom image borders for clinical workstation look */
         .img-container img {
             border: 2px solid rgba(128, 128, 128, 0.3);
@@ -135,26 +141,34 @@ with st.sidebar:
         unsafe_allow_html=True
     )
     
-    with st.expander("✉️ Contact Developer"):
-        contact_name = st.text_input("Name", placeholder="Your Name", label_visibility="collapsed", key="contact_name")
-        contact_email = st.text_input("Email", placeholder="Your Email", label_visibility="collapsed", key="contact_email")
-        contact_msg = st.text_area("Message", placeholder="Type your message...", label_visibility="collapsed", key="contact_msg")
+    # Initialize contact message session state
+    if "message_sent" not in st.session_state:
+        st.session_state.message_sent = False
         
-        if st.button("Send Message", use_container_width=True, key="btn_send_contact"):
-            if not contact_name.strip() or not contact_email.strip() or not contact_msg.strip():
-                st.error("Please fill in all fields.")
-            else:
-                with st.spinner("Delivering message..."):
-                    success, response_msg = send_contact_message(
-                        contact_name.strip(),
-                        contact_email.strip(),
-                        contact_msg.strip()
-                    )
-                if success:
-                    st.success("Sent!")
-                    st.toast("Message sent successfully!", icon="✉️")
+    with st.expander("✉️ Contact Developer"):
+        if st.session_state.message_sent:
+            st.success("📩 Message sent! Thank you for reaching out.")
+        else:
+            contact_name = st.text_input("Name", placeholder="Your Name", label_visibility="collapsed", key="contact_name")
+            contact_email = st.text_input("Email", placeholder="Your Email", label_visibility="collapsed", key="contact_email")
+            contact_msg = st.text_area("Message", placeholder="Type your message...", label_visibility="collapsed", key="contact_msg")
+            
+            if st.button("Send Message", use_container_width=True, key="btn_send_contact"):
+                if not contact_name.strip() or not contact_email.strip() or not contact_msg.strip():
+                    st.error("Please fill in all fields.")
                 else:
-                    st.error(f"Error: {response_msg}")
+                    with st.spinner("Delivering message..."):
+                        success, response_msg = send_contact_message(
+                            contact_name.strip(),
+                            contact_email.strip(),
+                            contact_msg.strip()
+                        )
+                    if success:
+                        st.session_state.message_sent = True
+                        st.toast("Message sent successfully!", icon="✉️")
+                        st.rerun()
+                    else:
+                        st.error(f"Error: {response_msg}")
             
 
 #---------------Main Canvas Layout------------------------------------------------------
