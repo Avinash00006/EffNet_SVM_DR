@@ -87,22 +87,24 @@ if hasattr(st, "dialog"):
 
             /* 2x3 Grid Column Cards */
             div[data-testid="stDialog"] div[data-testid="stColumn"],
+            div[data-baseweb="modal"] div[data-testid="stColumn"],
             div[role="dialog"] div[data-testid="stColumn"] {
                 position: relative !important;
-                border: 1.5px solid #E2E8F0 !important;
+                border: 2px solid #CBD5E1 !important;
                 border-radius: 14px !important;
-                padding: 8px 8px 10px 8px !important;
+                padding: 10px 8px 12px 8px !important;
                 text-align: center !important;
                 transition: all 0.2s ease-in-out !important;
                 background-color: #FFFFFF !important;
                 cursor: pointer !important;
-                box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04) !important;
+                box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08) !important;
             }
             div[data-testid="stDialog"] div[data-testid="stColumn"]:hover,
+            div[data-baseweb="modal"] div[data-testid="stColumn"]:hover,
             div[role="dialog"] div[data-testid="stColumn"]:hover {
                 border-color: #2B59ED !important;
                 transform: translateY(-2px) !important;
-                box-shadow: 0 6px 18px rgba(43, 89, 237, 0.16) !important;
+                box-shadow: 0 8px 24px rgba(43, 89, 237, 0.22) !important;
             }
 
             /* Neutralize intermediate wrappers so button stretches across entire stColumn */
@@ -110,45 +112,102 @@ if hasattr(st, "dialog"):
             div[data-testid="stDialog"] div[data-testid="stColumn"] div[data-testid="stVerticalBlockBorderWrapper"],
             div[data-testid="stDialog"] div[data-testid="stColumn"] div[data-testid="stElementContainer"],
             div[data-testid="stDialog"] div[data-testid="stColumn"] div.element-container,
+            div[data-baseweb="modal"] div[data-testid="stColumn"] div[data-testid="stVerticalBlock"],
+            div[data-baseweb="modal"] div[data-testid="stColumn"] div[data-testid="stElementContainer"],
             div[role="dialog"] div[data-testid="stColumn"] div[data-testid="stVerticalBlock"],
             div[role="dialog"] div[data-testid="stColumn"] div[data-testid="stElementContainer"] {
                 position: static !important;
+                background: transparent !important;
+                background-color: transparent !important;
             }
 
-            /* Fundus image thumbnail: pointer-events none */
+            /* Fundus image thumbnail: Perfectly centered */
             div[data-testid="stDialog"] div[data-testid="stColumn"] [data-testid="stImage"],
+            div[data-baseweb="modal"] div[data-testid="stColumn"] [data-testid="stImage"],
             div[role="dialog"] div[data-testid="stColumn"] [data-testid="stImage"] {
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
+                width: 100% !important;
+                margin: 0 auto 6px auto !important;
                 pointer-events: none !important;
-                user-select: none !important;
-                -webkit-user-select: none !important;
             }
             div[data-testid="stDialog"] div[data-testid="stColumn"] img,
+            div[data-baseweb="modal"] div[data-testid="stColumn"] img,
             div[role="dialog"] div[data-testid="stColumn"] img {
-                max-height: 95px !important;
-                height: 95px !important;
+                max-height: 105px !important;
+                height: 105px !important;
                 width: auto !important;
-                border-radius: 8px !important;
+                margin: 0 auto !important;
+                display: block !important;
+                border-radius: 10px !important;
                 object-fit: cover !important;
-                border: 1px solid #E2E8F0 !important;
+                border: 1px solid #CBD5E1 !important;
                 pointer-events: none !important;
                 user-select: none !important;
                 -webkit-user-select: none !important;
             }
 
-            /* Text labels: pointer-events none */
+            /* FORCE 100% VISIBLE CRISP DARK TEXT IN SAMPLE CARDS */
             div[data-testid="stDialog"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"],
+            div[data-testid="stDialog"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"] *,
+            div[data-testid="stDialog"] div[data-testid="stColumn"] p,
+            div[data-testid="stDialog"] div[data-testid="stColumn"] span,
+            div[data-testid="stDialog"] div[data-testid="stColumn"] div,
+            div[data-baseweb="modal"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"],
+            div[data-baseweb="modal"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"] *,
+            div[data-baseweb="modal"] div[data-testid="stColumn"] p,
+            div[data-baseweb="modal"] div[data-testid="stColumn"] span,
+            div[data-baseweb="modal"] div[data-testid="stColumn"] div,
+            div[role="dialog"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"],
+            div[role="dialog"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"] *,
+            div[role="dialog"] div[data-testid="stColumn"] p,
+            div[role="dialog"] div[data-testid="stColumn"] span,
+            div[role="dialog"] div[data-testid="stColumn"] div {
+                color: #0F172A !important;
+                opacity: 1 !important;
+            }
+
+            /* Custom hash color */
+            div[role="dialog"] div[data-testid="stColumn"] .sample-case-hash,
+            div[data-baseweb="modal"] div[data-testid="stColumn"] .sample-case-hash,
+            div[data-testid="stDialog"] div[data-testid="stColumn"] .sample-case-hash {
+                color: #475569 !important;
+                font-family: monospace !important;
+                font-weight: 600 !important;
+            }
+
+            /* Custom action badge */
+            div[role="dialog"] div[data-testid="stColumn"] .sample-select-badge,
+            div[data-baseweb="modal"] div[data-testid="stColumn"] .sample-select-badge,
+            div[data-testid="stDialog"] div[data-testid="stColumn"] .sample-select-badge {
+                color: #1D4ED8 !important;
+                background-color: #DBEAFE !important;
+                border: 1px solid #93C5FD !important;
+                border-radius: 6px !important;
+                padding: 3px 8px !important;
+                font-weight: 700 !important;
+                display: inline-block !important;
+            }
+
+            /* Text labels container */
+            div[data-testid="stDialog"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"],
+            div[data-baseweb="modal"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"],
             div[role="dialog"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"] {
+                position: relative !important;
+                z-index: 10 !important;
                 pointer-events: none !important;
                 user-select: none !important;
                 -webkit-user-select: none !important;
+                width: 100% !important;
+                text-align: center !important;
             }
 
-            /* Streamlit button overlay spans entire column */
+            /* Streamlit button overlay spans entire column with pure transparent background */
             div[data-testid="stDialog"] div[data-testid="stColumn"] div.stButton,
             div[data-testid="stDialog"] div[data-testid="stColumn"] div[data-testid="stButton"],
+            div[data-baseweb="modal"] div[data-testid="stColumn"] div.stButton,
+            div[data-baseweb="modal"] div[data-testid="stColumn"] div[data-testid="stButton"],
             div[role="dialog"] div[data-testid="stColumn"] div.stButton,
             div[role="dialog"] div[data-testid="stColumn"] div[data-testid="stButton"] {
                 position: absolute !important;
@@ -161,10 +220,16 @@ if hasattr(st, "dialog"):
                 height: 100% !important;
                 margin: 0 !important;
                 padding: 0 !important;
+                background: transparent !important;
+                background-color: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
                 z-index: 50 !important;
             }
             div[data-testid="stDialog"] div[data-testid="stColumn"] div.stButton > button,
             div[data-testid="stDialog"] div[data-testid="stColumn"] div[data-testid="stButton"] > button,
+            div[data-baseweb="modal"] div[data-testid="stColumn"] div.stButton > button,
+            div[data-baseweb="modal"] div[data-testid="stColumn"] div[data-testid="stButton"] > button,
             div[role="dialog"] div[data-testid="stColumn"] div.stButton > button,
             div[role="dialog"] div[data-testid="stColumn"] div[data-testid="stButton"] > button {
                 position: absolute !important;
@@ -179,6 +244,8 @@ if hasattr(st, "dialog"):
                 cursor: pointer !important;
                 border: none !important;
                 background: transparent !important;
+                background-color: transparent !important;
+                box-shadow: none !important;
                 z-index: 51 !important;
                 margin: 0 !important;
                 padding: 0 !important;
@@ -210,10 +277,10 @@ if hasattr(st, "dialog"):
                         st.image(img, use_container_width=True)
                         st.markdown(
                             f"""
-                            <div style='text-align: center; margin-top: 4px; pointer-events: none;'>
-                                <div style='font-size: 0.82rem; font-weight: 800; color: #0F172A !important; line-height: 1.2;'>{short_name}</div>
-                                <div style='font-size: 0.65rem; font-weight: 600; color: #64748B !important; font-family: monospace;'>ID: {case_hash[:8]}...</div>
-                                <div style='font-size: 0.65rem; font-weight: 700; color: #2B59ED !important; background: #EEF2FF; border-radius: 6px; padding: 2px 6px; margin: 4px auto 0 auto; width: fit-content;'>👆 Click to Select</div>
+                            <div style='text-align: center; margin-top: 6px; pointer-events: none;'>
+                                <div style='font-size: 0.92rem; font-weight: 800; color: #0F172A !important; line-height: 1.2;'>{short_name}</div>
+                                <div class='sample-case-hash' style='font-size: 0.68rem; font-weight: 600; color: #475569 !important; margin: 3px 0 5px 0;'>ID: {case_hash[:8]}...</div>
+                                <div class='sample-select-badge'>👆 Click to Select</div>
                             </div>
                             """,
                             unsafe_allow_html=True
@@ -228,7 +295,7 @@ if hasattr(st, "dialog"):
                         st.rerun()
 
             if row_idx == 0:
-                st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+                st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
 
     @st.dialog("✉️ Contact Developer", width="small")
     def show_contact_dialog():
