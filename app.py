@@ -324,41 +324,132 @@ st.markdown("""
         }
         
         /* 3. Header & Sidebar Controls (Ensuring Reliable Collapse & Re-opening with Reference Icon) */
-        header[data-testid="stHeader"] {
+        header[data-testid="stHeader"],
+        .stAppHeader {
             height: 3.5rem !important;
             background: transparent !important;
             background-color: transparent !important;
             pointer-events: auto !important;
             z-index: 100 !important;
+            display: flex !important;
+            visibility: visible !important;
+        }
+
+        /* Keep the header toolbar active and transparent so the reopen button is always reachable */
+        div[data-testid="stToolbar"],
+        header [data-testid="stToolbar"],
+        .stAppToolbar {
+            background: transparent !important;
+            pointer-events: auto !important;
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            height: auto !important;
+            width: 100% !important;
         }
         
-        /* Reopen Container: Placed at top-left when sidebar is collapsed */
-        div[data-testid="collapsedControl"] {
+        /* Reopen / Expand Control Container across all Streamlit versions */
+        button[data-testid="stExpandSidebarButton"],
+        [data-testid="stExpandSidebarButton"] button,
+        [data-testid="stExpandSidebarButton"],
+        div[data-testid="collapsedControl"] button,
+        [data-testid="collapsedControl"] button,
+        div[data-testid="collapsedControl"],
+        [data-testid="collapsedControl"],
+        [data-testid="stSidebarCollapsedControl"],
+        button[aria-label*="Expand sidebar" i],
+        button[aria-label*="Open sidebar" i] {
             position: fixed !important;
             top: 14px !important;
             left: 14px !important;
             z-index: 999999 !important;
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            display: inline-flex !important;
+            display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            width: auto !important;
-            height: auto !important;
+            width: 36px !important;
+            height: 36px !important;
+            min-width: 36px !important;
+            min-height: 36px !important;
+            max-width: 36px !important;
+            max-height: 36px !important;
+            background-color: #FFFFFF !important;
+            border: 1.5px solid #CBD5E1 !important;
+            border-radius: 10px !important;
+            color: #1E293B !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08) !important;
+            cursor: pointer !important;
+            pointer-events: auto !important;
+            transition: all 0.2s ease !important;
+            overflow: hidden !important;
+            font-size: 0 !important;
+            line-height: 0 !important;
             visibility: visible !important;
             opacity: 1 !important;
-            pointer-events: auto !important;
-        }
-        div[data-testid="collapsedControl"]::before,
-        div[data-testid="collapsedControl"]::after {
-            content: none !important;
-            display: none !important;
         }
 
-        /* Sidebar Header and Collapse Container Neutralization */
+        button[data-testid="stExpandSidebarButton"]:hover,
+        [data-testid="stExpandSidebarButton"] button:hover,
+        [data-testid="stExpandSidebarButton"]:hover,
+        div[data-testid="collapsedControl"] button:hover,
+        [data-testid="collapsedControl"] button:hover,
+        [data-testid="collapsedControl"]:hover,
+        [data-testid="stSidebarCollapsedControl"]:hover,
+        button[aria-label*="Expand sidebar" i]:hover,
+        button[aria-label*="Open sidebar" i]:hover {
+            border-color: #2563EB !important;
+            background-color: #EFF6FF !important;
+            color: #2563EB !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.22) !important;
+        }
+
+        /* Suppress default icons inside expand buttons */
+        button[data-testid="stExpandSidebarButton"] svg,
+        button[data-testid="stExpandSidebarButton"] span,
+        [data-testid="stExpandSidebarButton"] svg,
+        [data-testid="stExpandSidebarButton"] span,
+        [data-testid="collapsedControl"] svg,
+        [data-testid="collapsedControl"] span,
+        [data-testid="stSidebarCollapsedControl"] svg,
+        [data-testid="stSidebarCollapsedControl"] span,
+        button[aria-label*="Expand sidebar" i] svg,
+        button[aria-label*="Expand sidebar" i] span,
+        button[aria-label*="Open sidebar" i] svg,
+        button[aria-label*="Open sidebar" i] span {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            width: 0 !important;
+            height: 0 !important;
+            pointer-events: none !important;
+        }
+
+        /* Inject Reference Icon for Expand Button (chevron pointing RIGHT >) */
+        button[data-testid="stExpandSidebarButton"]::after,
+        [data-testid="stExpandSidebarButton"] button::after,
+        [data-testid="stExpandSidebarButton"]::after,
+        div[data-testid="collapsedControl"] button::after,
+        [data-testid="collapsedControl"] button::after,
+        [data-testid="collapsedControl"]::after,
+        [data-testid="stSidebarCollapsedControl"]::after,
+        button[aria-label*="Expand sidebar" i]::after,
+        button[aria-label*="Open sidebar" i]::after {
+            content: "" !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            width: 22px !important;
+            height: 22px !important;
+            background-color: currentColor !important;
+            -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='2.5' width='19' height='19' rx='5'/%3E%3Cline x1='8.5' y1='2.5' x2='8.5' y2='21.5'/%3E%3Cpolyline points='12.5 8.5 16.5 12 12.5 15.5'/%3E%3C/svg%3E") no-repeat center / contain !important;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='2.5' width='19' height='19' rx='5'/%3E%3Cline x1='8.5' y1='2.5' x2='8.5' y2='21.5'/%3E%3Cpolyline points='12.5 8.5 16.5 12 12.5 15.5'/%3E%3C/svg%3E") no-repeat center / contain !important;
+            pointer-events: none !important;
+        }
+
+        /* Sidebar Header and Collapse Container */
         div[data-testid="stSidebarHeader"] {
             display: flex !important;
             justify-content: flex-end !important;
@@ -384,10 +475,12 @@ st.markdown("""
             display: none !important;
         }
 
-        /* Unified Button Styling: Target STRICTLY the <button> element */
-        div[data-testid="collapsedControl"] button,
+        /* Collapse button inside sidebar */
         div[data-testid="stSidebarCollapseButton"] button,
-        div[data-testid="stSidebarHeader"] button {
+        div[data-testid="stSidebarHeader"] button,
+        button[data-testid="stSidebarCollapseButton"],
+        button[aria-label*="Collapse sidebar" i],
+        button[aria-label*="Close sidebar" i] {
             position: relative !important;
             display: flex !important;
             align-items: center !important;
@@ -412,9 +505,11 @@ st.markdown("""
             font-size: 0 !important;
             line-height: 0 !important;
         }
-        div[data-testid="collapsedControl"] button:hover,
         div[data-testid="stSidebarCollapseButton"] button:hover,
-        div[data-testid="stSidebarHeader"] button:hover {
+        div[data-testid="stSidebarHeader"] button:hover,
+        button[data-testid="stSidebarCollapseButton"]:hover,
+        button[aria-label*="Collapse sidebar" i]:hover,
+        button[aria-label*="Close sidebar" i]:hover {
             border-color: #2563EB !important;
             background-color: #EFF6FF !important;
             color: #2563EB !important;
@@ -422,13 +517,15 @@ st.markdown("""
             box-shadow: 0 6px 20px rgba(37, 99, 235, 0.22) !important;
         }
 
-        /* Suppress ONLY native SVGs and text glyphs inside the buttons */
-        div[data-testid="collapsedControl"] button svg,
-        div[data-testid="collapsedControl"] button span,
+        /* Suppress default icons inside collapse button */
         div[data-testid="stSidebarCollapseButton"] button svg,
         div[data-testid="stSidebarCollapseButton"] button span,
         div[data-testid="stSidebarHeader"] button svg,
-        div[data-testid="stSidebarHeader"] button span {
+        div[data-testid="stSidebarHeader"] button span,
+        button[aria-label*="Collapse sidebar" i] svg,
+        button[aria-label*="Collapse sidebar" i] span,
+        button[aria-label*="Close sidebar" i] svg,
+        button[aria-label*="Close sidebar" i] span {
             display: none !important;
             visibility: hidden !important;
             opacity: 0 !important;
@@ -437,9 +534,12 @@ st.markdown("""
             pointer-events: none !important;
         }
 
-        /* Collapse button inside sidebar: Reference squircle with chevron pointing LEFT < */
+        /* Inject Reference Icon for Collapse Button (chevron pointing LEFT <) */
         div[data-testid="stSidebarCollapseButton"] button::after,
-        div[data-testid="stSidebarHeader"] button::after {
+        div[data-testid="stSidebarHeader"] button::after,
+        button[data-testid="stSidebarCollapseButton"]::after,
+        button[aria-label*="Collapse sidebar" i]::after,
+        button[aria-label*="Close sidebar" i]::after {
             content: "" !important;
             position: absolute !important;
             top: 50% !important;
@@ -450,21 +550,6 @@ st.markdown("""
             background-color: currentColor !important;
             -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='2.5' width='19' height='19' rx='5'/%3E%3Cline x1='8.5' y1='2.5' x2='8.5' y2='21.5'/%3E%3Cpolyline points='16.5 8.5 12.5 12 16.5 15.5'/%3E%3C/svg%3E") no-repeat center / contain !important;
             mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='2.5' width='19' height='19' rx='5'/%3E%3Cline x1='8.5' y1='2.5' x2='8.5' y2='21.5'/%3E%3Cpolyline points='16.5 8.5 12.5 12 16.5 15.5'/%3E%3C/svg%3E") no-repeat center / contain !important;
-            pointer-events: none !important;
-        }
-
-        /* Open / Reopen button when sidebar is collapsed: Reference squircle with chevron pointing RIGHT > */
-        div[data-testid="collapsedControl"] button::after {
-            content: "" !important;
-            position: absolute !important;
-            top: 50% !important;
-            left: 50% !important;
-            transform: translate(-50%, -50%) !important;
-            width: 22px !important;
-            height: 22px !important;
-            background-color: currentColor !important;
-            -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='2.5' width='19' height='19' rx='5'/%3E%3Cline x1='8.5' y1='2.5' x2='8.5' y2='21.5'/%3E%3Cpolyline points='12.5 8.5 16.5 12 12.5 15.5'/%3E%3C/svg%3E") no-repeat center / contain !important;
-            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='2.5' width='19' height='19' rx='5'/%3E%3Cline x1='8.5' y1='2.5' x2='8.5' y2='21.5'/%3E%3Cpolyline points='12.5 8.5 16.5 12 12.5 15.5'/%3E%3C/svg%3E") no-repeat center / contain !important;
             pointer-events: none !important;
         }
         
@@ -481,11 +566,8 @@ st.markdown("""
             background: rgba(37, 99, 235, 0.25) !important;
         }
 
-        /* Hide unwanted default Streamlit badges & toolbar clutter */
-        div[data-testid="stToolbar"],
-        [data-testid="stToolbar"],
-        header [data-testid="stToolbar"],
-        .stToolbar,
+        /* Hide ONLY unwanted right-hand menu badges & deployment clutter (Preserving Toolbar Container) */
+        [data-testid="stHeaderRightSection"],
         .stToolbarActions,
         div[data-testid="stShareButton"],
         button[data-testid="stShareButton"],
