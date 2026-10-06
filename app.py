@@ -213,7 +213,6 @@ with st.sidebar:
             except Exception as e:
                 validation_error = f"Failed to parse image file: {str(e)}"
     else:
-    else:
         st.markdown("<span style='font-size:0.8rem; color:#64748B; font-weight:600;'>BROWSE CLINICAL SAMPLES:</span>", unsafe_allow_html=True)
         
         btn_normal = st.button("🟢 Normal Images", use_container_width=True, key="btn_side_norm")
