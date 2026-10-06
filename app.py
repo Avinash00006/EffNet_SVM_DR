@@ -36,80 +36,199 @@ ORIGINAL_DR_CASES = {
 if hasattr(st, "dialog"):
     @st.dialog("🖼️ Select Clinical Case", width="large")
     def show_sample_gallery_dialog(category_name, cases_dict):
-        st.markdown(f"<h3 style='margin: 0 0 2px 0; font-size: 1.1rem; color: #1E293B !important; font-weight: 800;'>{category_name}</h3>", unsafe_allow_html=True)
-        st.markdown("<p style='margin: 0 0 12px 0; font-size: 0.78rem; color: #64748B !important;'>Click directly on any retinal photography case below to load and analyze:</p>", unsafe_allow_html=True)
+        st.markdown(
+            f"""
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;">
+                <div style="font-size: 1.10rem; font-weight: 800; color: #0F172A !important; letter-spacing: -0.01em;">{category_name}</div>
+                <div style="font-size: 0.70rem; font-weight: 700; color: #2B59ED !important; background: #EEF2FF; border: 1px solid #C7D2FE; padding: 2px 8px; border-radius: 12px;">6 REAL CASES</div>
+            </div>
+            <div style="font-size: 0.78rem; font-weight: 500; color: #475569 !important; margin-bottom: 14px; line-height: 1.4;">
+                Click directly on any retinal photography case below to load and run automated diagnostic analysis:
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
         
-        # Horizontal compact card styling with direct-click button overlay per column
+        # Grid CSS & Direct-Click Card Styling
         st.markdown("""
         <style>
-            div[data-testid="stDialog"] div[role="dialog"] {
-                max-width: 820px !important;
-                width: 90vw !important;
+            /* Modal Surface - Clean Light Clinical Styling with High Contrast */
+            div[data-testid="stDialog"] div[role="dialog"],
+            div[data-baseweb="modal"] div[role="dialog"],
+            div[data-testid="stModal"] div[role="dialog"],
+            div[role="dialog"] {
+                max-width: 660px !important;
+                width: 92vw !important;
                 background-color: #FFFFFF !important;
                 border-radius: 16px !important;
-                border: 1px solid #E2E8F0 !important;
-                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22) !important;
+                border: 1px solid #CBD5E1 !important;
+                box-shadow: 0 20px 50px rgba(15, 23, 42, 0.22) !important;
                 padding: 16px 20px !important;
             }
-            div[data-testid="stDialog"] div[role="dialog"] * {
-                color: #1E293B !important;
+            div[data-testid="stDialog"] div[role="dialog"] > div,
+            div[data-baseweb="modal"] div[role="dialog"] > div,
+            div[data-testid="stModal"] div[role="dialog"] > div,
+            div[role="dialog"] > div {
+                background-color: #FFFFFF !important;
             }
-            div[data-testid="stDialog"] div[data-testid="stColumn"] {
+            div[data-testid="stDialog"] h2,
+            div[data-testid="stDialog"] [data-testid="stHeadingWithActionElements"] h2,
+            div[role="dialog"] h2,
+            div[role="dialog"] [data-testid="stHeadingWithActionElements"] h2 {
+                color: #0F172A !important;
+                font-size: 1.15rem !important;
+                font-weight: 800 !important;
+            }
+            div[role="dialog"] button[aria-label="Close"],
+            div[data-testid="stDialog"] button[aria-label="Close"] svg {
+                color: #475569 !important;
+                fill: #475569 !important;
+            }
+
+            /* 2x3 Grid Column Cards */
+            div[data-testid="stDialog"] div[data-testid="stColumn"],
+            div[role="dialog"] div[data-testid="stColumn"] {
                 position: relative !important;
                 border: 1.5px solid #E2E8F0 !important;
-                border-radius: 12px !important;
-                padding: 5px !important;
+                border-radius: 14px !important;
+                padding: 8px 8px 10px 8px !important;
                 text-align: center !important;
                 transition: all 0.2s ease-in-out !important;
                 background-color: #FFFFFF !important;
                 cursor: pointer !important;
+                box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04) !important;
             }
-            div[data-testid="stDialog"] div[data-testid="stColumn"]:hover {
+            div[data-testid="stDialog"] div[data-testid="stColumn"]:hover,
+            div[role="dialog"] div[data-testid="stColumn"]:hover {
                 border-color: #2B59ED !important;
                 transform: translateY(-2px) !important;
-                box-shadow: 0 4px 14px rgba(43, 89, 237, 0.2) !important;
+                box-shadow: 0 6px 18px rgba(43, 89, 237, 0.16) !important;
             }
-            div[data-testid="stDialog"] div[data-testid="stColumn"] img {
-                max-height: 80px !important;
+
+            /* Neutralize intermediate wrappers so button stretches across entire stColumn */
+            div[data-testid="stDialog"] div[data-testid="stColumn"] div[data-testid="stVerticalBlock"],
+            div[data-testid="stDialog"] div[data-testid="stColumn"] div[data-testid="stVerticalBlockBorderWrapper"],
+            div[data-testid="stDialog"] div[data-testid="stColumn"] div[data-testid="stElementContainer"],
+            div[data-testid="stDialog"] div[data-testid="stColumn"] div.element-container,
+            div[role="dialog"] div[data-testid="stColumn"] div[data-testid="stVerticalBlock"],
+            div[role="dialog"] div[data-testid="stColumn"] div[data-testid="stElementContainer"] {
+                position: static !important;
+            }
+
+            /* Fundus image thumbnail: pointer-events none */
+            div[data-testid="stDialog"] div[data-testid="stColumn"] [data-testid="stImage"],
+            div[role="dialog"] div[data-testid="stColumn"] [data-testid="stImage"] {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                pointer-events: none !important;
+                user-select: none !important;
+                -webkit-user-select: none !important;
+            }
+            div[data-testid="stDialog"] div[data-testid="stColumn"] img,
+            div[role="dialog"] div[data-testid="stColumn"] img {
+                max-height: 95px !important;
+                height: 95px !important;
+                width: auto !important;
                 border-radius: 8px !important;
                 object-fit: cover !important;
+                border: 1px solid #E2E8F0 !important;
+                pointer-events: none !important;
+                user-select: none !important;
+                -webkit-user-select: none !important;
             }
-            div[data-testid="stDialog"] div[data-testid="stColumn"] div.stButton {
+
+            /* Text labels: pointer-events none */
+            div[data-testid="stDialog"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"],
+            div[role="dialog"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"] {
+                pointer-events: none !important;
+                user-select: none !important;
+                -webkit-user-select: none !important;
+            }
+
+            /* Streamlit button overlay spans entire column */
+            div[data-testid="stDialog"] div[data-testid="stColumn"] div.stButton,
+            div[data-testid="stDialog"] div[data-testid="stColumn"] div[data-testid="stButton"],
+            div[role="dialog"] div[data-testid="stColumn"] div.stButton,
+            div[role="dialog"] div[data-testid="stColumn"] div[data-testid="stButton"] {
                 position: absolute !important;
+                inset: 0 !important;
                 top: 0 !important;
                 left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
                 width: 100% !important;
                 height: 100% !important;
                 margin: 0 !important;
                 padding: 0 !important;
-                z-index: 10 !important;
+                z-index: 50 !important;
             }
-            div[data-testid="stDialog"] div[data-testid="stColumn"] div.stButton button {
+            div[data-testid="stDialog"] div[data-testid="stColumn"] div.stButton > button,
+            div[data-testid="stDialog"] div[data-testid="stColumn"] div[data-testid="stButton"] > button,
+            div[role="dialog"] div[data-testid="stColumn"] div.stButton > button,
+            div[role="dialog"] div[data-testid="stColumn"] div[data-testid="stButton"] > button {
+                position: absolute !important;
+                inset: 0 !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
                 width: 100% !important;
                 height: 100% !important;
                 opacity: 0 !important;
                 cursor: pointer !important;
                 border: none !important;
                 background: transparent !important;
+                z-index: 51 !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
         </style>
         """, unsafe_allow_html=True)
         
-        # Horizontal layout: All 6 cases in a single horizontal row
+        # 2 Rows with 3 Images in each row (3 columns per row)
         cases_list = list(cases_dict.items())
-        cols = st.columns(len(cases_list))
-        for idx, (label, rel_path) in enumerate(cases_list):
-            full_path = os.path.join(os.path.dirname(__file__), rel_path)
-            short_name = label.split(" ")[0] + " " + label.split(" ")[1]  # "Case 1", "Case 2", etc.
-            with cols[idx]:
-                if os.path.exists(full_path):
-                    img = Image.open(full_path)
-                    st.image(img, use_container_width=True)
-                    st.markdown(f"<div style='font-size: 0.70rem; font-weight: 700; color: #1E293B !important; margin-top: 3px; text-align: center;'>{short_name}</div>", unsafe_allow_html=True)
-                if st.button(f"Select {label}", key=f"btn_modal_{category_name}_{idx}"):
-                    st.session_state.selected_sample_path = full_path
-                    st.session_state.selected_sample_label = f"{category_name} - {label}"
-                    st.rerun()
+        safe_cat = "norm" if "Normal" in category_name else "dr"
+        
+        for row_idx in range(0, len(cases_list), 3):
+            row_cases = cases_list[row_idx : row_idx + 3]
+            cols = st.columns(3)
+            for col_idx, (label, rel_path) in enumerate(row_cases):
+                global_idx = row_idx + col_idx
+                full_path = os.path.join(os.path.dirname(__file__), rel_path)
+                
+                if " (" in label:
+                    short_name = label.split(" (")[0]
+                    case_hash = label.split(" (")[1].replace(")", "")
+                else:
+                    short_name = label
+                    case_hash = ""
+                    
+                with cols[col_idx]:
+                    if os.path.exists(full_path):
+                        img = Image.open(full_path)
+                        st.image(img, use_container_width=True)
+                        st.markdown(
+                            f"""
+                            <div style='text-align: center; margin-top: 4px; pointer-events: none;'>
+                                <div style='font-size: 0.82rem; font-weight: 800; color: #0F172A !important; line-height: 1.2;'>{short_name}</div>
+                                <div style='font-size: 0.65rem; font-weight: 600; color: #64748B !important; font-family: monospace;'>ID: {case_hash[:8]}...</div>
+                                <div style='font-size: 0.65rem; font-weight: 700; color: #2B59ED !important; background: #EEF2FF; border-radius: 6px; padding: 2px 6px; margin: 4px auto 0 auto; width: fit-content;'>👆 Click to Select</div>
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+                    
+                    if st.button(
+                        f"Select {short_name}",
+                        key=f"btn_pick_{safe_cat}_{global_idx}"
+                    ):
+                        st.session_state.selected_sample_path = full_path
+                        st.session_state.selected_sample_label = f"{category_name} - {label}"
+                        st.rerun()
+
+            if row_idx == 0:
+                st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
 
     @st.dialog("✉️ Contact Developer", width="small")
     def show_contact_dialog():
@@ -242,26 +361,50 @@ st.markdown("""
             line-height: 1.3 !important;
         }
         
-        /* 5. Sidebar: Zero Scrolling & Ultra-Compact Instrument Styling */
+        /* 5. Sidebar: Restored Smooth Scrolling & Generous Proportional Spacing */
         section[data-testid="stSidebar"],
         [data-testid="stSidebar"],
         div[data-testid="stSidebarUserContent"] {
-            width: 255px !important;
-            min-width: 255px !important;
-            max-width: 260px !important;
+            width: 280px !important;
+            min-width: 280px !important;
+            max-width: 285px !important;
             background-color: #FFFFFF !important;
             border-right: 1px solid #E2E8F0 !important;
             box-shadow: 4px 0 16px rgba(43, 89, 237, 0.03) !important;
-            overflow-y: hidden !important;
+            overflow-y: auto !important;
             overflow-x: hidden !important;
         }
         [data-testid="stSidebarContent"] {
-            padding-top: 0.8rem !important;
-            padding-bottom: 0.6rem !important;
-            padding-left: 0.85rem !important;
-            padding-right: 0.85rem !important;
-            overflow-y: hidden !important;
+            padding-top: 1.4rem !important;
+            padding-bottom: 2.2rem !important;
+            padding-left: 1.15rem !important;
+            padding-right: 1.15rem !important;
+            overflow-y: auto !important;
             overflow-x: hidden !important;
+        }
+        section[data-testid="stSidebar"]::-webkit-scrollbar,
+        [data-testid="stSidebarContent"]::-webkit-scrollbar {
+            width: 5px !important;
+        }
+        section[data-testid="stSidebar"]::-webkit-scrollbar-track,
+        [data-testid="stSidebarContent"]::-webkit-scrollbar-track {
+            background: transparent !important;
+        }
+        section[data-testid="stSidebar"]::-webkit-scrollbar-thumb,
+        [data-testid="stSidebarContent"]::-webkit-scrollbar-thumb {
+            background: #CBD5E1 !important;
+            border-radius: 4px !important;
+        }
+        section[data-testid="stSidebar"]::-webkit-scrollbar-thumb:hover,
+        [data-testid="stSidebarContent"]::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8 !important;
+        }
+        div[data-testid="stSidebar"] div.stButton button {
+            margin-bottom: 8px !important;
+            padding: 8px 12px !important;
+            font-size: 12.5px !important;
+            font-weight: 700 !important;
+            border-radius: 10px !important;
         }
         
         /* Medcare Sidebar Brand Badge */
@@ -727,7 +870,7 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("<div style='font-size: 0.72rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.04em; margin: 4px 0 3px 0;'>📁 Fundus Input Source</div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size: 0.74rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.04em; margin: 14px 0 8px 0;'>📁 Fundus Input Source</div>", unsafe_allow_html=True)
     input_mode = st.radio(
         "Choose Input Source",
         ["📤 Upload Image", "🖼️ Preloaded Sample Cases"],
@@ -753,7 +896,7 @@ with st.sidebar:
             except Exception as e:
                 validation_error = f"Failed to parse image file: {str(e)}"
     else:
-        st.markdown("<div style='font-size:0.70rem; color:#64748B; font-weight:700; margin: 4px 0 2px 0;'>CLINICAL SAMPLES:</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size: 0.74rem; color: #475569; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; margin: 16px 0 8px 0;'>🔬 Clinical Samples:</div>", unsafe_allow_html=True)
         
         btn_normal = st.button("🟢 Normal Images", use_container_width=True, key="btn_side_norm")
         btn_dr = st.button("🔴 Diabetic Retinopathy Cases", use_container_width=True, key="btn_side_dr")
@@ -769,7 +912,17 @@ with st.sidebar:
                 try:
                     active_image = Image.open(sample_path).convert("RGB")
                     active_source_label = st.session_state.selected_sample_label
-                    st.caption(f"✓ **Active Case:** {os.path.basename(sample_path)}")
+                    
+                    st.markdown("""
+                    <div style='background: #EEF2FF; border: 1.5px solid #C7D2FE; border-radius: 10px; padding: 8px 10px; margin-top: 10px;'>
+                        <div style='font-size: 0.68rem; font-weight: 800; color: #2B59ED; text-transform: uppercase; letter-spacing: 0.03em;'>ACTIVE CLINICAL CASE</div>
+                        <div style='font-size: 0.78rem; font-weight: 700; color: #1E293B; word-break: break-all; margin-top: 2px;'>""" + os.path.basename(sample_path) + """</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    if st.button("✕ Deselect Case", key="btn_reset_sample", use_container_width=True):
+                        st.session_state.selected_sample_path = None
+                        st.session_state.selected_sample_label = None
+                        st.rerun()
                 except Exception as e:
                     validation_error = f"Failed to load sample image: {str(e)}"
             else:
@@ -781,13 +934,13 @@ with st.sidebar:
         if not is_valid:
             validation_error = validation_msg
             
-    st.markdown("<div style='border-top: 1px solid #E2E8F0; margin: 8px 0;'></div>", unsafe_allow_html=True)
-    st.markdown("<div style='font-size: 0.70rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px;'>📬 Developer & Support</div>", unsafe_allow_html=True)
+    st.markdown("<div style='border-top: 1.5px solid #E2E8F0; margin: 20px 0 16px 0;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size: 0.74rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px;'>📬 Developer & Support</div>", unsafe_allow_html=True)
     
     # Custom HTML for social links (styled with clean, high-contrast badges)
     st.markdown(
         """
-        <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
             <a href="https://github.com/Avinash00006" target="_blank" class="social-badge">
                 🐙 GitHub
             </a>
