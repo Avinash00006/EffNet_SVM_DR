@@ -32,30 +32,47 @@ ORIGINAL_DR_CASES = {
 }
 
 # Modal dialog for browsing real fundus images
+# Modal dialogs for browsing real fundus images and contacting developer
 if hasattr(st, "dialog"):
-    @st.dialog("🖼️ Select Clinical Case", width="small")
+    @st.dialog("🖼️ Select Clinical Case", width="large")
     def show_sample_gallery_dialog(category_name, cases_dict):
-        st.markdown(f"<h3 style='margin: 0 0 4px 0; font-size: 1.15rem; color: #1E293B;'>{category_name}</h3>", unsafe_allow_html=True)
-        st.markdown("<p style='margin: 0 0 14px 0; font-size: 0.82rem; color: #64748B;'>Click directly on any retinal photography case below to load and analyze:</p>", unsafe_allow_html=True)
+        st.markdown(f"<h3 style='margin: 0 0 2px 0; font-size: 1.1rem; color: #1E293B !important; font-weight: 800;'>{category_name}</h3>", unsafe_allow_html=True)
+        st.markdown("<p style='margin: 0 0 12px 0; font-size: 0.78rem; color: #64748B !important;'>Click directly on any retinal photography case below to load and analyze:</p>", unsafe_allow_html=True)
         
-        # Isolated card styling with direct-click button overlay per column
+        # Horizontal compact card styling with direct-click button overlay per column
         st.markdown("""
         <style>
+            div[data-testid="stDialog"] div[role="dialog"] {
+                max-width: 820px !important;
+                width: 90vw !important;
+                background-color: #FFFFFF !important;
+                border-radius: 16px !important;
+                border: 1px solid #E2E8F0 !important;
+                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22) !important;
+                padding: 16px 20px !important;
+            }
+            div[data-testid="stDialog"] div[role="dialog"] * {
+                color: #1E293B !important;
+            }
             div[data-testid="stDialog"] div[data-testid="stColumn"] {
                 position: relative !important;
-                border: 2px solid #E2E8F0 !important;
-                border-radius: 14px !important;
-                padding: 8px !important;
+                border: 1.5px solid #E2E8F0 !important;
+                border-radius: 12px !important;
+                padding: 5px !important;
                 text-align: center !important;
                 transition: all 0.2s ease-in-out !important;
                 background-color: #FFFFFF !important;
                 cursor: pointer !important;
-                margin-bottom: 8px !important;
             }
             div[data-testid="stDialog"] div[data-testid="stColumn"]:hover {
                 border-color: #2B59ED !important;
                 transform: translateY(-2px) !important;
-                box-shadow: 0 6px 18px rgba(43, 89, 237, 0.18) !important;
+                box-shadow: 0 4px 14px rgba(43, 89, 237, 0.2) !important;
+            }
+            div[data-testid="stDialog"] div[data-testid="stColumn"] img {
+                max-height: 80px !important;
+                border-radius: 8px !important;
+                object-fit: cover !important;
             }
             div[data-testid="stDialog"] div[data-testid="stColumn"] div.stButton {
                 position: absolute !important;
@@ -78,27 +95,56 @@ if hasattr(st, "dialog"):
         </style>
         """, unsafe_allow_html=True)
         
-        # Row-by-row layout (2 cards per row) so each column contains exactly ONE image
+        # Horizontal layout: All 6 cases in a single horizontal row
         cases_list = list(cases_dict.items())
-        for row_i in range(0, len(cases_list), 2):
-            row_cols = st.columns(2)
-            for c_i in range(2):
-                idx = row_i + c_i
-                if idx < len(cases_list):
-                    label, rel_path = cases_list[idx]
-                    full_path = os.path.join(os.path.dirname(__file__), rel_path)
-                    with row_cols[c_i]:
-                        if os.path.exists(full_path):
-                            img = Image.open(full_path)
-                            st.image(img, use_container_width=True)
-                            st.markdown(f"<div style='font-size: 0.76rem; font-weight: 700; color: #1E293B; margin-top: 3px;'>{label}</div>", unsafe_allow_html=True)
-                        if st.button(f"Select {label}", key=f"btn_modal_{category_name}_{idx}"):
-                            st.session_state.selected_sample_path = full_path
-                            st.session_state.selected_sample_label = f"{category_name} - {label}"
-                            st.rerun()
+        cols = st.columns(len(cases_list))
+        for idx, (label, rel_path) in enumerate(cases_list):
+            full_path = os.path.join(os.path.dirname(__file__), rel_path)
+            short_name = label.split(" ")[0] + " " + label.split(" ")[1]  # "Case 1", "Case 2", etc.
+            with cols[idx]:
+                if os.path.exists(full_path):
+                    img = Image.open(full_path)
+                    st.image(img, use_container_width=True)
+                    st.markdown(f"<div style='font-size: 0.70rem; font-weight: 700; color: #1E293B !important; margin-top: 3px; text-align: center;'>{short_name}</div>", unsafe_allow_html=True)
+                if st.button(f"Select {label}", key=f"btn_modal_{category_name}_{idx}"):
+                    st.session_state.selected_sample_path = full_path
+                    st.session_state.selected_sample_label = f"{category_name} - {label}"
+                    st.rerun()
+
+    @st.dialog("✉️ Contact Developer", width="small")
+    def show_contact_dialog():
+        st.markdown("<h3 style='margin: 0 0 2px 0; font-size: 1.1rem; color: #1E293B !important; font-weight: 800;'>✉️ Contact Developer</h3>", unsafe_allow_html=True)
+        st.markdown("<p style='margin: 0 0 14px 0; font-size: 0.8rem; color: #64748B !important;'>Have questions or feedback? Send a message directly:</p>", unsafe_allow_html=True)
+        
+        if st.session_state.get("message_sent", False):
+            st.success("📩 Message already sent! Thank you for reaching out.")
+            return
+
+        contact_name = st.text_input("Name", placeholder="Your Name", key="dlg_contact_name")
+        contact_email = st.text_input("Email", placeholder="Your Email", key="dlg_contact_email")
+        contact_msg = st.text_area("Message", placeholder="Type your message...", key="dlg_contact_msg")
+        
+        if st.button("Send Message", use_container_width=True, key="dlg_btn_send"):
+            if not contact_name.strip() or not contact_email.strip() or not contact_msg.strip():
+                st.error("Please fill in all fields.")
+            else:
+                with st.spinner("Delivering message..."):
+                    success, response_msg = send_contact_message(
+                        contact_name.strip(),
+                        contact_email.strip(),
+                        contact_msg.strip()
+                    )
+                if success:
+                    st.session_state.message_sent = True
+                    st.toast("Message sent successfully!", icon="✉️")
+                    st.rerun()
+                else:
+                    st.error(f"Error: {response_msg}")
 else:
     def show_sample_gallery_dialog(category_name, cases_dict):
         st.session_state.fallback_gallery_open = True
+    def show_contact_dialog():
+        pass
 
 
 #---------------Streamlit UI Page Settings---------------------------------------------
@@ -121,50 +167,74 @@ st.markdown("""
             color: #1E293B !important;
         }
         
-        /* 2. Compact Viewport Container (Optimized for 100% Zoom) */
+        /* 2. Compact Viewport Container (Optimized for 100% Zoom with Breathing Space) */
         .block-container,
         [data-testid="stMainBlockContainer"] {
-            max-width: 1400px !important;
-            padding-top: 1.0rem !important;
-            padding-bottom: 1.5rem !important;
-            padding-left: 1.75rem !important;
-            padding-right: 1.75rem !important;
+            max-width: 1260px !important;
+            padding-top: 2.2rem !important;
+            padding-bottom: 2.0rem !important;
+            padding-left: 2.0rem !important;
+            padding-right: 2.0rem !important;
             margin: 0 auto !important;
         }
         
-        /* Transparent Header */
+        /* 3. Hide Streamlit Header, Toolbar, Share Button, and Decoration */
         header[data-testid="stHeader"] {
-            height: 2.4rem !important;
+            height: 0px !important;
             background: transparent !important;
             background-color: transparent !important;
         }
+        div[data-testid="stToolbar"],
+        [data-testid="stToolbar"],
+        header [data-testid="stToolbar"],
+        .stToolbar,
+        .stToolbarActions,
+        div[data-testid="stShareButton"],
+        button[data-testid="stShareButton"],
+        .viewerBadge,
+        a[class*="viewerBadge"],
+        div[class*="viewerBadge"],
+        .stDeployButton,
+        #MainMenu,
+        footer,
+        div[data-testid="stDecoration"],
+        #stDecoration,
+        div[data-testid="InputInstructions"] {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            height: 0 !important;
+            width: 0 !important;
+            pointer-events: none !important;
+        }
         
-        /* 3. Typography Hierarchy (Scaled down for 100% Zoom) */
+        /* 4. Typography Hierarchy & Contrast */
         h1, [data-testid="stHeadingWithActionElements"] h1 {
-            font-size: 1.35rem !important;
+            font-size: 1.30rem !important;
             font-weight: 800 !important;
             line-height: 1.25 !important;
-            margin: 0.2rem 0 0.4rem 0 !important;
+            margin: 0.2rem 0 0.35rem 0 !important;
             color: #1E293B !important;
             letter-spacing: -0.02em !important;
         }
         h2, [data-testid="stHeadingWithActionElements"] h2 {
-            font-size: 1.15rem !important;
+            font-size: 1.10rem !important;
             font-weight: 700 !important;
             line-height: 1.25 !important;
-            margin: 0.2rem 0 0.35rem 0 !important;
+            margin: 0.2rem 0 0.30rem 0 !important;
             color: #1E293B !important;
         }
         h3, [data-testid="stHeadingWithActionElements"] h3 {
-            font-size: 0.95rem !important;
+            font-size: 0.90rem !important;
             font-weight: 700 !important;
             line-height: 1.3 !important;
             margin: 0.15rem 0 0.25rem 0 !important;
             color: #1E293B !important;
         }
         p, span, label, [data-testid="stMarkdownContainer"] p {
-            font-size: 13.5px !important;
+            font-size: 13px !important;
             line-height: 1.45 !important;
+            color: #1E293B;
         }
         small, .caption, [data-testid="stImageCaption"] {
             font-size: 11.5px !important;
@@ -172,75 +242,88 @@ st.markdown("""
             line-height: 1.3 !important;
         }
         
-        /* 4. Sidebar: Medcare Clean Styling */
+        /* 5. Sidebar: Zero Scrolling & Ultra-Compact Instrument Styling */
         section[data-testid="stSidebar"],
-        [data-testid="stSidebar"] {
-            width: 270px !important;
-            min-width: 270px !important;
-            max-width: 275px !important;
+        [data-testid="stSidebar"],
+        div[data-testid="stSidebarUserContent"] {
+            width: 255px !important;
+            min-width: 255px !important;
+            max-width: 260px !important;
             background-color: #FFFFFF !important;
             border-right: 1px solid #E2E8F0 !important;
-            box-shadow: 4px 0 20px rgba(43, 89, 237, 0.03) !important;
+            box-shadow: 4px 0 16px rgba(43, 89, 237, 0.03) !important;
+            overflow-y: hidden !important;
+            overflow-x: hidden !important;
         }
         [data-testid="stSidebarContent"] {
-            padding-top: 1.2rem !important;
-            padding-left: 1.0rem !important;
-            padding-right: 1.0rem !important;
+            padding-top: 0.8rem !important;
+            padding-bottom: 0.6rem !important;
+            padding-left: 0.85rem !important;
+            padding-right: 0.85rem !important;
+            overflow-y: hidden !important;
+            overflow-x: hidden !important;
         }
         
         /* Medcare Sidebar Brand Badge */
         .medcare-sidebar-brand {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             background: linear-gradient(135deg, #2B59ED 0%, #3B71F7 100%);
-            padding: 12px 16px;
-            border-radius: 14px;
+            padding: 8px 12px;
+            border-radius: 12px;
             color: #FFFFFF !important;
-            margin-bottom: 18px;
-            box-shadow: 0 6px 18px rgba(43, 89, 237, 0.22);
+            margin-bottom: 8px;
+            box-shadow: 0 4px 14px rgba(43, 89, 237, 0.2);
         }
         .medcare-sidebar-brand h2 {
             color: #FFFFFF !important;
             margin: 0 !important;
-            font-size: 1.15rem !important;
+            font-size: 1.0rem !important;
             font-weight: 800 !important;
             letter-spacing: -0.02em;
+            line-height: 1.1;
         }
         
-        /* 5. Medcare Cards & Containers */
+        /* 6. Medcare Cards & Containers */
         .medcare-card {
             background: #FFFFFF;
-            border-radius: 18px;
+            border-radius: 14px;
             border: 1px solid #E9EFF7;
-            padding: 18px 20px;
-            box-shadow: 0 4px 18px rgba(43, 89, 237, 0.04);
-            margin-bottom: 16px;
+            padding: 12px 14px;
+            box-shadow: 0 2px 10px rgba(43, 89, 237, 0.04);
+            margin-bottom: 12px;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .medcare-card:hover {
-            box-shadow: 0 6px 24px rgba(43, 89, 237, 0.08);
+            box-shadow: 0 4px 16px rgba(43, 89, 237, 0.08);
+        }
+        .medcare-card * {
+            color: #1E293B !important;
+        }
+        .medcare-card p {
+            color: #475569 !important;
         }
         
-        /* 6. Buttons: Royal Blue Pill */
+        /* 7. Buttons: Royal Blue Pill */
         [data-testid="stButton"] button,
         .stButton > button {
             background: linear-gradient(135deg, #2B59ED 0%, #3B71F7 100%) !important;
             color: #FFFFFF !important;
             border: none !important;
-            border-radius: 12px !important;
-            min-height: 34px !important;
-            height: 34px !important;
-            padding: 4px 14px !important;
+            border-radius: 10px !important;
+            min-height: 32px !important;
+            height: 32px !important;
+            padding: 3px 12px !important;
             font-weight: 600 !important;
-            font-size: 13px !important;
+            font-size: 12.5px !important;
             letter-spacing: -0.01em !important;
-            box-shadow: 0 4px 12px rgba(43, 89, 237, 0.22) !important;
+            box-shadow: 0 3px 10px rgba(43, 89, 237, 0.2) !important;
             transition: all 0.2s ease-in-out !important;
         }
         .stButton > button:hover {
-            transform: translateY(-2px) !important;
-            box-shadow: 0 6px 18px rgba(43, 89, 237, 0.35) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 5px 14px rgba(43, 89, 237, 0.3) !important;
             color: #FFFFFF !important;
         }
         
@@ -249,7 +332,7 @@ st.markdown("""
             background: #FFFFFF !important;
             color: #10B981 !important;
             border: 1.5px solid #10B981 !important;
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15) !important;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.12) !important;
         }
         button[key="btn_side_norm"]:hover, button[key="btn_w_norm"]:hover {
             background: #E6F9F2 !important;
@@ -259,59 +342,110 @@ st.markdown("""
             background: #FFFFFF !important;
             color: #EF4444 !important;
             border: 1.5px solid #EF4444 !important;
-            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15) !important;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.12) !important;
         }
         button[key="btn_side_dr"]:hover, button[key="btn_w_dr"]:hover {
             background: #FEECEB !important;
             color: #DC2626 !important;
         }
         
-        /* 7. Tabs: Sleek Clinical Pill Tabs */
+        /* 8. Tabs: Sleek Clinical Pill Tabs */
         .stTabs [data-baseweb="tab-list"] {
             gap: 6px !important;
             background-color: #EBF0F9 !important;
             padding: 4px !important;
-            border-radius: 14px !important;
-            min-height: 34px !important;
+            border-radius: 12px !important;
+            min-height: 32px !important;
         }
         .stTabs [data-baseweb="tab"] {
-            border-radius: 10px !important;
-            padding: 6px 16px !important;
+            border-radius: 9px !important;
+            padding: 5px 14px !important;
             font-weight: 600 !important;
-            font-size: 13px !important;
+            font-size: 12.5px !important;
             color: #64748B !important;
             background-color: transparent !important;
             border: none !important;
-            min-height: 32px !important;
-            height: 32px !important;
+            min-height: 30px !important;
+            height: 30px !important;
         }
         .stTabs [aria-selected="true"] {
             background-color: #FFFFFF !important;
             color: #2B59ED !important;
-            box-shadow: 0 2px 8px rgba(43, 89, 237, 0.12) !important;
+            box-shadow: 0 2px 6px rgba(43, 89, 237, 0.12) !important;
         }
         
-        /* 8. Radio Buttons as Segmented Control */
+        /* 9. Radio Buttons as Segmented Control */
         div[data-testid="stRadio"] > div {
             background-color: #EBF0F9;
-            padding: 4px;
-            border-radius: 12px;
-            gap: 4px;
+            padding: 3px;
+            border-radius: 10px;
+            gap: 3px;
         }
         div[data-testid="stRadio"] label {
-            padding: 5px 12px;
-            border-radius: 9px;
+            padding: 4px 10px;
+            border-radius: 8px;
             font-weight: 600;
-            font-size: 12.5px;
-            color: #475569;
+            font-size: 12px;
+            color: #475569 !important;
         }
         div[data-testid="stRadio"] label[data-checked="true"] {
             background-color: #FFFFFF;
-            color: #2B59ED;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            color: #2B59ED !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+        }
+
+        /* 9b. Clean Light-Themed File Uploader (Zero Dark Backgrounds) */
+        [data-testid="stFileUploader"] {
+            background-color: transparent !important;
+        }
+        [data-testid="stFileUploader"] section,
+        [data-testid="stFileUploaderDropzone"],
+        section[data-testid="stFileUploadDropzone"],
+        div[data-testid="stFileUploaderDropzone"] {
+            background-color: #F8FAFC !important;
+            border: 1.5px dashed #CBD5E1 !important;
+            border-radius: 12px !important;
+            color: #1E293B !important;
+            padding: 8px 10px !important;
+            transition: all 0.2s ease-in-out !important;
+        }
+        [data-testid="stFileUploader"] section:hover,
+        [data-testid="stFileUploaderDropzone"]:hover,
+        section[data-testid="stFileUploadDropzone"]:hover {
+            border-color: #2B59ED !important;
+            background-color: #EEF2FF !important;
+        }
+        [data-testid="stFileUploader"] * {
+            color: #1E293B !important;
+        }
+        [data-testid="stFileUploader"] span,
+        [data-testid="stFileUploader"] small,
+        [data-testid="stFileUploader"] p,
+        [data-testid="stFileUploader"] label {
+            color: #475569 !important;
+        }
+        [data-testid="stFileUploader"] button {
+            background: #FFFFFF !important;
+            color: #1E293B !important;
+            border: 1.5px solid #CBD5E1 !important;
+            border-radius: 8px !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) !important;
+            height: 28px !important;
+            min-height: 28px !important;
+        }
+        [data-testid="stFileUploader"] button:hover {
+            background-color: #F1F5F9 !important;
+            color: #2B59ED !important;
+            border-color: #2B59ED !important;
+        }
+        [data-testid="stFileUploader"] svg {
+            fill: #2B59ED !important;
+            stroke: #2B59ED !important;
         }
         
-        /* 9. Fundus Image Display Constraints (Compact 290px max) */
+        /* 10. Fundus Image Display Constraints (Compact 290px max) */
         [data-testid="stImage"] {
             display: flex !important;
             flex-direction: column !important;
@@ -335,66 +469,106 @@ st.markdown("""
             display: inline-flex;
             align-items: center;
             background-color: #EEF2FF;
-            color: #2B59ED;
-            padding: 3px 10px;
+            color: #2B59ED !important;
+            padding: 3px 9px;
             border-radius: 9999px;
-            font-size: 0.72rem;
+            font-size: 0.70rem;
             font-weight: 700;
-            margin-right: 6px;
+            margin-right: 5px;
             border: 1px solid #E0E7FF;
         }
 
-        /* 10. Medcare Hero Banner & KPI Components */
+        /* Social Badges with Guaranteed Visibility */
+        .social-badge {
+            text-decoration: none !important;
+            color: #1E293B !important;
+            background-color: #F1F5F9 !important;
+            border: 1px solid #CBD5E1 !important;
+            padding: 4px 9px !important;
+            border-radius: 7px !important;
+            font-size: 0.72rem !important;
+            font-weight: 700 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 4px !important;
+            cursor: pointer !important;
+            transition: all 0.15s ease-in-out !important;
+        }
+        .social-badge:hover {
+            background-color: #E2E8F0 !important;
+            color: #2B59ED !important;
+            border-color: #94A3B8 !important;
+        }
+
+        /* 11. Medcare Hero Banner & KPI Components (Compact Sizing) */
         .medcare-hero-banner {
             background: linear-gradient(135deg, #1E3A8A 0%, #2B59ED 60%, #3B82F6 100%);
-            border-radius: 20px;
-            padding: 22px 26px;
+            border-radius: 16px;
+            padding: 16px 22px;
             color: #FFFFFF !important;
-            box-shadow: 0 10px 25px rgba(43, 89, 237, 0.2);
+            box-shadow: 0 6px 20px rgba(43, 89, 237, 0.16);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 18px;
+            margin-bottom: 14px;
             position: relative;
             overflow: hidden;
         }
         .medcare-hero-banner::after {
             content: "";
             position: absolute;
-            right: -30px;
-            top: -30px;
-            width: 200px;
-            height: 200px;
+            right: -25px;
+            top: -25px;
+            width: 170px;
+            height: 170px;
             border-radius: 50%;
             background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%);
             pointer-events: none;
         }
+        .medcare-hero-banner h2 {
+            color: #FFFFFF !important;
+            font-size: 1.25rem !important;
+            font-weight: 800 !important;
+            margin: 2px 0 4px 0 !important;
+            letter-spacing: -0.02em !important;
+        }
+        .medcare-hero-banner p {
+            color: rgba(255, 255, 255, 0.94) !important;
+            font-size: 0.80rem !important;
+            line-height: 1.45 !important;
+            margin: 0 !important;
+            max-width: 680px !important;
+        }
+        .medcare-hero-banner div,
+        .medcare-hero-banner span {
+            color: #FFFFFF !important;
+        }
         .medcare-badge-live {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             background: rgba(255, 255, 255, 0.18);
             border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #FFFFFF;
-            font-size: 0.7rem;
+            color: #FFFFFF !important;
+            font-size: 0.68rem;
             font-weight: 700;
-            padding: 3px 10px;
+            padding: 2px 8px;
             border-radius: 20px;
             letter-spacing: 0.04em;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         .medcare-kpi-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 12px;
-            margin-bottom: 18px;
+            margin-bottom: 14px;
         }
         .medcare-kpi-card {
             background: #FFFFFF;
-            border-radius: 16px;
-            padding: 13px 15px;
+            border-radius: 14px;
+            padding: 10px 14px;
             border: 1px solid #E9EFF7;
-            box-shadow: 0 2px 10px rgba(43, 89, 237, 0.04);
+            box-shadow: 0 2px 8px rgba(43, 89, 237, 0.04);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -402,111 +576,111 @@ st.markdown("""
         }
         .medcare-kpi-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(43, 89, 237, 0.08);
+            box-shadow: 0 4px 14px rgba(43, 89, 237, 0.08);
         }
         .kpi-title {
-            font-size: 0.7rem;
+            font-size: 0.64rem;
             font-weight: 700;
             text-transform: uppercase;
-            color: #64748B;
+            color: #64748B !important;
             letter-spacing: 0.03em;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
         .kpi-val {
-            font-size: 1.35rem;
+            font-size: 1.20rem;
             font-weight: 800;
-            color: #1E293B;
+            color: #1E293B !important;
             line-height: 1.1;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
         .kpi-badge-positive {
             display: inline-flex;
             align-items: center;
             gap: 3px;
-            font-size: 0.68rem;
+            font-size: 0.66rem;
             font-weight: 700;
-            color: #10B981;
+            color: #10B981 !important;
             background: #E6F9F2;
-            padding: 2px 7px;
-            border-radius: 10px;
+            padding: 2px 6px;
+            border-radius: 8px;
             width: fit-content;
         }
         .kpi-badge-neutral {
             display: inline-flex;
             align-items: center;
             gap: 3px;
-            font-size: 0.68rem;
+            font-size: 0.66rem;
             font-weight: 700;
-            color: #2B59ED;
+            color: #2B59ED !important;
             background: #EEF2FF;
-            padding: 2px 7px;
-            border-radius: 10px;
+            padding: 2px 6px;
+            border-radius: 8px;
             width: fit-content;
         }
         
-        /* 11. Medcare Patient Study Header & Diagnosis Cards */
+        /* 12. Medcare Patient Study Header & Diagnosis Cards */
         .medcare-study-header {
             background: #FFFFFF;
-            border-radius: 14px;
-            padding: 12px 18px;
+            border-radius: 12px;
+            padding: 10px 16px;
             border: 1px solid #E9EFF7;
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 18px;
             align-items: center;
-            margin-bottom: 18px;
-            box-shadow: 0 2px 8px rgba(43, 89, 237, 0.04);
+            margin-bottom: 14px;
+            box-shadow: 0 2px 6px rgba(43, 89, 237, 0.04);
         }
         .study-meta-item {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 1px;
         }
         .meta-label {
-            font-size: 0.68rem;
+            font-size: 0.64rem;
             font-weight: 700;
-            color: #94A3B8;
+            color: #94A3B8 !important;
             text-transform: uppercase;
             letter-spacing: 0.04em;
         }
         .meta-val {
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 700;
-            color: #1E293B;
+            color: #1E293B !important;
         }
         
         .diagnosis-card-dr {
             background: #FFFFFF;
-            border-radius: 16px;
+            border-radius: 14px;
             border: 1px solid #FEE2E2;
-            border-left: 6px solid #EF4444;
-            padding: 16px 18px;
-            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.08);
+            border-left: 5px solid #EF4444;
+            padding: 14px 16px;
+            box-shadow: 0 3px 12px rgba(239, 68, 68, 0.08);
             display: flex;
             align-items: flex-start;
-            gap: 14px;
-            min-height: 125px;
+            gap: 12px;
+            min-height: 115px;
         }
         .diagnosis-card-normal {
             background: #FFFFFF;
-            border-radius: 16px;
+            border-radius: 14px;
             border: 1px solid #D1FAE5;
-            border-left: 6px solid #10B981;
-            padding: 16px 18px;
-            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.08);
+            border-left: 5px solid #10B981;
+            padding: 14px 16px;
+            box-shadow: 0 3px 12px rgba(16, 185, 129, 0.08);
             display: flex;
             align-items: flex-start;
-            gap: 14px;
-            min-height: 125px;
+            gap: 12px;
+            min-height: 115px;
         }
         
         /* Biomarker Severity Matrix Card */
         .biomarker-card {
             background: #FFFFFF;
-            border-radius: 16px;
+            border-radius: 14px;
             border: 1px solid #E9EFF7;
-            padding: 12px 16px;
-            box-shadow: 0 2px 10px rgba(43, 89, 237, 0.04);
+            padding: 10px 14px;
+            box-shadow: 0 2px 8px rgba(43, 89, 237, 0.04);
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -516,30 +690,24 @@ st.markdown("""
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
         .biomarker-name {
-            font-size: 0.76rem;
+            font-size: 0.74rem;
             font-weight: 600;
-            color: #475569;
+            color: #475569 !important;
         }
         .biomarker-bar-bg {
             background-color: #F1F5F9;
-            height: 6px;
-            border-radius: 6px;
+            height: 5px;
+            border-radius: 5px;
             width: 100%;
             overflow: hidden;
             margin-top: 2px;
         }
         .biomarker-bar-fill {
             height: 100%;
-            border-radius: 6px;
-        }
-
-        /* Remove Streamlit default Deploy, main menu, footer, and decoration */
-        .stDeployButton, #MainMenu, footer, div[data-testid="stDecoration"], div[data-testid="InputInstructions"] {
-            display: none !important;
-            visibility: hidden !important;
+            border-radius: 5px;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -551,15 +719,15 @@ full_model, feature_extractor, scaler, svm, load_error = load_models()
 with st.sidebar:
     st.markdown("""
     <div class="medcare-sidebar-brand">
-        <span style="font-size: 1.5rem;">👁️</span>
+        <span style="font-size: 1.15rem;">👁️</span>
         <div>
             <h2>RetinaAI Care</h2>
-            <div style="font-size: 0.7rem; opacity: 0.88; font-weight: 500;">CLINICAL DECISION SYSTEM</div>
+            <div style="font-size: 0.64rem; opacity: 0.9; font-weight: 600;">CLINICAL DECISION SYSTEM</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
     
-    st.subheader("📁 Fundus Photography Input")
+    st.markdown("<div style='font-size: 0.72rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.04em; margin: 4px 0 3px 0;'>📁 Fundus Input Source</div>", unsafe_allow_html=True)
     input_mode = st.radio(
         "Choose Input Source",
         ["📤 Upload Image", "🖼️ Preloaded Sample Cases"],
@@ -585,7 +753,7 @@ with st.sidebar:
             except Exception as e:
                 validation_error = f"Failed to parse image file: {str(e)}"
     else:
-        st.markdown("<span style='font-size:0.8rem; color:#64748B; font-weight:600;'>BROWSE CLINICAL SAMPLES:</span>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size:0.70rem; color:#64748B; font-weight:700; margin: 4px 0 2px 0;'>CLINICAL SAMPLES:</div>", unsafe_allow_html=True)
         
         btn_normal = st.button("🟢 Normal Images", use_container_width=True, key="btn_side_norm")
         btn_dr = st.button("🔴 Diabetic Retinopathy Cases", use_container_width=True, key="btn_side_dr")
@@ -601,19 +769,7 @@ with st.sidebar:
                 try:
                     active_image = Image.open(sample_path).convert("RGB")
                     active_source_label = st.session_state.selected_sample_label
-                    
-                    st.markdown("---")
-                    st.caption(f"**Active Case:** {os.path.basename(sample_path)}")
-                    st.image(active_image, use_container_width=True)
-                    
-                    with open(sample_path, "rb") as f:
-                        st.download_button(
-                            label="📥 Download Raw PNG",
-                            data=f.read(),
-                            file_name=os.path.basename(sample_path),
-                            mime="image/png",
-                            use_container_width=True
-                        )
+                    st.caption(f"✓ **Active Case:** {os.path.basename(sample_path)}")
                 except Exception as e:
                     validation_error = f"Failed to load sample image: {str(e)}"
             else:
@@ -625,17 +781,17 @@ with st.sidebar:
         if not is_valid:
             validation_error = validation_msg
             
-    st.markdown("---")
-    st.subheader("📬 Developer & Support")
+    st.markdown("<div style='border-top: 1px solid #E2E8F0; margin: 8px 0;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size: 0.70rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px;'>📬 Developer & Support</div>", unsafe_allow_html=True)
     
-    # Custom HTML for social links (styled with clean CSS badges)
+    # Custom HTML for social links (styled with clean, high-contrast badges)
     st.markdown(
         """
-        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-            <a href="https://github.com/Avinash00006" target="_blank" style="text-decoration: none; color: inherit; background-color: rgba(128,128,128,0.1); border: 1px solid rgba(128,128,128,0.18); padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; cursor: pointer;">
+        <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+            <a href="https://github.com/Avinash00006" target="_blank" class="social-badge">
                 🐙 GitHub
             </a>
-            <a href="https://linkedin.com/in/avinash-koneti" target="_blank" style="text-decoration: none; color: inherit; background-color: rgba(128,128,128,0.1); border: 1px solid rgba(128,128,128,0.18); padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; cursor: pointer;">
+            <a href="https://linkedin.com/in/avinash-koneti" target="_blank" class="social-badge">
                 🔗 LinkedIn
             </a>
         </div>
@@ -647,30 +803,9 @@ with st.sidebar:
     if "message_sent" not in st.session_state:
         st.session_state.message_sent = False
         
-    with st.expander("✉️ Contact Developer"):
-        if st.session_state.message_sent:
-            st.success("📩 Message sent! Thank you for reaching out.")
-        else:
-            contact_name = st.text_input("Name", placeholder="Your Name", label_visibility="collapsed", key="contact_name")
-            contact_email = st.text_input("Email", placeholder="Your Email", label_visibility="collapsed", key="contact_email")
-            contact_msg = st.text_area("Message", placeholder="Type your message...", label_visibility="collapsed", key="contact_msg")
-            
-            if st.button("Send Message", use_container_width=True, key="btn_send_contact"):
-                if not contact_name.strip() or not contact_email.strip() or not contact_msg.strip():
-                    st.error("Please fill in all fields.")
-                else:
-                    with st.spinner("Delivering message..."):
-                        success, response_msg = send_contact_message(
-                            contact_name.strip(),
-                            contact_email.strip(),
-                            contact_msg.strip()
-                        )
-                    if success:
-                        st.session_state.message_sent = True
-                        st.toast("Message sent successfully!", icon="✉️")
-                        st.rerun()
-                    else:
-                        st.error(f"Error: {response_msg}")
+    btn_contact_text = "✉️ Message Developer" if not st.session_state.message_sent else "✓ Message Delivered"
+    if st.button(btn_contact_text, use_container_width=True, key="btn_open_contact"):
+        show_contact_dialog()
             
 
 #---------------Main Canvas Layout------------------------------------------------------
@@ -699,12 +834,12 @@ if active_image is None:
     <div class="medcare-hero-banner">
         <div style="flex: 1; z-index: 1;">
             <div class="medcare-badge-live">🟢 CLINICAL WORKSTATION READY</div>
-            <h2 style="font-size: 1.45rem; font-weight: 800; color: #FFFFFF !important; margin: 6px 0 6px 0; letter-spacing: -0.02em;">Good Day, Clinician! 👋</h2>
-            <p style="color: rgba(255, 255, 255, 0.92); font-size: 0.86rem; line-height: 1.5; margin: 0; max-width: 660px;">
+            <h2 style="font-size: 1.22rem; font-weight: 800; color: #FFFFFF !important; margin: 2px 0 4px 0; letter-spacing: -0.02em;">Good Day, Clinician! 👋</h2>
+            <p style="color: rgba(255, 255, 255, 0.94) !important; font-size: 0.80rem; line-height: 1.42; margin: 0; max-width: 680px;">
                 Welcome to <b>RetinaAI Care</b> workstation. Automated ophthalmic fundus screening powered by hybrid EfficientNetV2-S deep feature extraction, Support Vector Machines, and Explainable AI (Grad-CAM & LIME).
             </p>
         </div>
-        <div style="font-size: 3.2rem; margin-left: 20px; opacity: 0.92; z-index: 1;">👁️‍🗨️</div>
+        <div style="font-size: 2.0rem; margin-left: 18px; opacity: 0.92; z-index: 1;">👁️‍🗨️</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -767,11 +902,11 @@ if active_image is None:
     with col1:
         st.markdown("""
         <div class="medcare-card">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                <span style="background: #EBF0F9; padding: 5px 8px; border-radius: 10px; font-size: 1rem;">📋</span>
-                <span style="font-weight: 700; font-size: 0.88rem; color: #1E293B;">1. Quality Assurance</span>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <span style="background: #EBF0F9; padding: 4px 7px; border-radius: 8px; font-size: 0.95rem;">📋</span>
+                <span style="font-weight: 700; font-size: 0.84rem; color: #1E293B !important;">1. Quality Assurance</span>
             </div>
-            <p style="font-size: 0.8rem; color: #64748B; margin: 0; line-height: 1.45;">
+            <p style="font-size: 0.76rem; color: #64748B !important; margin: 0; line-height: 1.4;">
                 Automated pre-flight validation analyzing aspect ratio, circular aperture coverage, and illumination metrics before pipeline inference.
             </p>
         </div>
@@ -779,11 +914,11 @@ if active_image is None:
     with col2:
         st.markdown("""
         <div class="medcare-card">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                <span style="background: #EBF0F9; padding: 5px 8px; border-radius: 10px; font-size: 1rem;">🧠</span>
-                <span style="font-weight: 700; font-size: 0.88rem; color: #1E293B;">2. Deep Feature Classifier</span>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <span style="background: #EBF0F9; padding: 4px 7px; border-radius: 8px; font-size: 0.95rem;">🧠</span>
+                <span style="font-weight: 700; font-size: 0.84rem; color: #1E293B !important;">2. Deep Feature Classifier</span>
             </div>
-            <p style="font-size: 0.8rem; color: #64748B; margin: 0; line-height: 1.45;">
+            <p style="font-size: 0.76rem; color: #64748B !important; margin: 0; line-height: 1.4;">
                 EfficientNetV2-S deep convolutional backbone extracts 1,280 structural features, classified with an RBF Support Vector Machine.
             </p>
         </div>
@@ -791,36 +926,15 @@ if active_image is None:
     with col3:
         st.markdown("""
         <div class="medcare-card">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                <span style="background: #EBF0F9; padding: 5px 8px; border-radius: 10px; font-size: 1rem;">🔬</span>
-                <span style="font-weight: 700; font-size: 0.88rem; color: #1E293B;">3. Interpretability (XAI)</span>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <span style="background: #EBF0F9; padding: 4px 7px; border-radius: 8px; font-size: 0.95rem;">🔬</span>
+                <span style="font-weight: 700; font-size: 0.84rem; color: #1E293B !important;">3. Interpretability (XAI)</span>
             </div>
-            <p style="font-size: 0.8rem; color: #64748B; margin: 0; line-height: 1.45;">
+            <p style="font-size: 0.76rem; color: #64748B !important; margin: 0; line-height: 1.4;">
                 Dual Explainable AI: Grad-CAM generates convolutional attention heatmaps, and LIME bounds influential superpixels.
             </p>
         </div>
         """, unsafe_allow_html=True)
-            
-    # 4. Authentic Clinical Cases Launcher
-    st.markdown("""
-    <div class="medcare-card" style="text-align: center; padding: 20px; border: 1.5px dashed #CBD5E1; background: #FFFFFF; margin-top: 8px; margin-bottom: 12px;">
-        <h4 style="margin: 0 0 6px 0; font-size: 1.0rem; font-weight: 700; color: #1E293B;">🖼️ Explore Authentic Clinical Retinal Scans</h4>
-        <p style="margin: 0 0 14px 0; color: #64748B; font-size: 0.82rem;">
-            Click a verified clinical case gallery below to inspect real fundus photography and evaluate AI diagnostic outputs:
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    col_w1, col_w2 = st.columns(2)
-    with col_w1:
-        if st.button("🟢 Browse Normal Retina Cases (6 Images)", use_container_width=True, key="btn_w_norm"):
-            show_sample_gallery_dialog("🟢 Normal Retina Cases", ORIGINAL_NORMAL_CASES)
-    with col_w2:
-        if st.button("🔴 Browse Diabetic Retinopathy Cases (6 Images)", use_container_width=True, key="btn_w_dr"):
-            show_sample_gallery_dialog("🔴 Diabetic Retinopathy Cases", ORIGINAL_DR_CASES)
-            
-    if input_mode == "📤 Upload Image":
-        st.caption("👈 **Clinician Tip**: You can also upload your own ophthalmic fundus image (.jpg / .png) via the left sidebar panel.")
 
 # UI STATE 2: Medical Report Screen (Image Uploaded or Sample Selected)
 else:
