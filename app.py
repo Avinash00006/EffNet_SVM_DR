@@ -34,7 +34,7 @@ ORIGINAL_DR_CASES = {
 # Modal dialog for browsing real fundus images
 # Modal dialogs for browsing real fundus images and contacting developer
 if hasattr(st, "dialog"):
-    @st.dialog("🖼️ Select Clinical Case", width="small")
+    @st.dialog("Select Clinical Case", width="small")
     def show_sample_gallery_dialog(category_name, cases_dict):
         st.markdown(
             f"""
@@ -250,13 +250,13 @@ if hasattr(st, "dialog"):
             if row_idx == 0:
                 st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
 
-    @st.dialog("✉️ Contact Developer", width="small")
+    @st.dialog("Contact Developer", width="small")
     def show_contact_dialog():
-        st.markdown("<h3 style='margin: 0 0 2px 0; font-size: 1.1rem; color: #1E293B !important; font-weight: 800;'>✉️ Contact Developer</h3>", unsafe_allow_html=True)
-        st.markdown("<p style='margin: 0 0 14px 0; font-size: 0.8rem; color: #64748B !important;'>Have questions or feedback? Send a message directly:</p>", unsafe_allow_html=True)
+        st.markdown("<h3 style='margin: 0 0 2px 0; font-size: 1.1rem; color: #0F2756 !important; font-weight: 800;'>Contact Developer</h3>", unsafe_allow_html=True)
+        st.markdown("<p style='margin: 0 0 14px 0; font-size: 0.8rem; color: #64748B !important;'>Have questions or feedback? Send a message directly to the developer:</p>", unsafe_allow_html=True)
         
         if st.session_state.get("message_sent", False):
-            st.success("📩 Message already sent! Thank you for reaching out.")
+            st.success("Message already sent. Thank you for reaching out.")
             return
 
         contact_name = st.text_input("Name", placeholder="Your Name", key="dlg_contact_name")
@@ -275,7 +275,7 @@ if hasattr(st, "dialog"):
                     )
                 if success:
                     st.session_state.message_sent = True
-                    st.toast("Message sent successfully!", icon="✉️")
+                    st.toast("Message sent successfully!")
                     st.rerun()
                 else:
                     st.error(f"Error: {response_msg}")
@@ -288,8 +288,7 @@ else:
 
 #---------------Streamlit UI Page Settings---------------------------------------------
 st.set_page_config(
-    page_title="Retinal diagnostics AI Workstation",
-    page_icon="👁️",
+    page_title="RetinaAI Care | Clinical Diagnostic Workstation",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -299,10 +298,18 @@ st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         
-        /* 1. Global Canvas & Typography */
+        /* 1. Global Canvas & Ambient Diagnostic Grid Background */
         html, body, [class*="css"], .stApp {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
-            background-color: #F4F7FC !important;
+            background-color: #F8FAFC !important;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(219, 234, 254, 0.65) 0px, transparent 55%),
+                radial-gradient(at 100% 0%, rgba(224, 242, 254, 0.55) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(238, 242, 255, 0.55) 0px, transparent 60%),
+                radial-gradient(#CBD5E1 0.85px, transparent 0.85px) !important;
+            background-size: 100% 100%, 100% 100%, 100% 100%, 24px 24px !important;
+            background-position: 0 0, 0 0, 0 0, 0 0 !important;
+            background-attachment: fixed !important;
             color: #1E293B !important;
         }
         
@@ -310,19 +317,100 @@ st.markdown("""
         .block-container,
         [data-testid="stMainBlockContainer"] {
             max-width: 1260px !important;
-            padding-top: 2.2rem !important;
+            padding-top: 2.0rem !important;
             padding-bottom: 2.0rem !important;
             padding-left: 2.0rem !important;
             padding-right: 2.0rem !important;
             margin: 0 auto !important;
         }
         
-        /* 3. Hide Streamlit Header, Toolbar, Share Button, and Decoration */
+        /* 3. Header & Sidebar Controls (Ensuring Closing & Re-opening Options) */
         header[data-testid="stHeader"] {
-            height: 0px !important;
+            height: 2.75rem !important;
             background: transparent !important;
             background-color: transparent !important;
+            pointer-events: none !important;
+            z-index: 99 !important;
         }
+        
+        /* Sidebar Open/Expand button when sidebar is closed */
+        [data-testid="collapsedControl"],
+        [data-testid="stSidebarCollapsedControl"],
+        button[data-testid="stSidebarCollapsedControl"] {
+            visibility: visible !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            position: fixed !important;
+            top: 12px !important;
+            left: 12px !important;
+            z-index: 999999 !important;
+            background-color: #FFFFFF !important;
+            border: 1.5px solid #CBD5E1 !important;
+            border-radius: 10px !important;
+            padding: 6px 10px !important;
+            box-shadow: 0 4px 12px rgba(43, 89, 237, 0.12) !important;
+            cursor: pointer !important;
+        }
+        [data-testid="collapsedControl"] svg,
+        [data-testid="stSidebarCollapsedControl"] svg {
+            fill: #2B59ED !important;
+            color: #2B59ED !important;
+            width: 18px !important;
+            height: 18px !important;
+        }
+        
+        /* Sidebar Collapse/Close Button (Closing option inside sidebar) */
+        [data-testid="stSidebarCollapseButton"],
+        div[data-testid="stSidebarHeader"] button,
+        [data-testid="stSidebarCollapseButton"] button,
+        button[data-testid="baseButton-headerNoPadding"] {
+            visibility: visible !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            opacity: 1 !important;
+            background-color: #F1F5F9 !important;
+            border: 1px solid #CBD5E1 !important;
+            border-radius: 10px !important;
+            color: #1E293B !important;
+            padding: 5px 8px !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+        [data-testid="stSidebarCollapseButton"]:hover,
+        div[data-testid="stSidebarHeader"] button:hover {
+            background-color: #E2E8F0 !important;
+            border-color: #94A3B8 !important;
+        }
+        [data-testid="stSidebarCollapseButton"] svg,
+        div[data-testid="stSidebarHeader"] svg,
+        button[data-testid="baseButton-headerNoPadding"] svg {
+            fill: #1E293B !important;
+            stroke: #1E293B !important;
+            color: #1E293B !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            width: 18px !important;
+            height: 18px !important;
+        }
+        
+        /* Sidebar Resizer Handle (Draggable to extend sidebar to the right) */
+        [data-testid="stSidebarResizer"] {
+            visibility: visible !important;
+            display: block !important;
+            cursor: col-resize !important;
+            width: 8px !important;
+            background: transparent !important;
+            transition: background 0.2s ease !important;
+        }
+        [data-testid="stSidebarResizer"]:hover {
+            background: rgba(43, 89, 237, 0.25) !important;
+        }
+
+        /* Hide unwanted default Streamlit badges & toolbar clutter */
         div[data-testid="stToolbar"],
         [data-testid="stToolbar"],
         header [data-testid="stToolbar"],
@@ -347,58 +435,70 @@ st.markdown("""
             pointer-events: none !important;
         }
         
-        /* 4. Typography Hierarchy & Contrast */
+        /* 4. Typography Hierarchy & Contrast (Deep Clinical Navy & Refined Slate) */
         h1, [data-testid="stHeadingWithActionElements"] h1 {
             font-size: 1.30rem !important;
             font-weight: 800 !important;
             line-height: 1.25 !important;
             margin: 0.2rem 0 0.35rem 0 !important;
-            color: #1E293B !important;
+            color: #0F2756 !important;
             letter-spacing: -0.02em !important;
         }
         h2, [data-testid="stHeadingWithActionElements"] h2 {
             font-size: 1.10rem !important;
-            font-weight: 700 !important;
+            font-weight: 800 !important;
             line-height: 1.25 !important;
             margin: 0.2rem 0 0.30rem 0 !important;
-            color: #1E293B !important;
+            color: #0F2756 !important;
         }
         h3, [data-testid="stHeadingWithActionElements"] h3 {
-            font-size: 0.90rem !important;
+            font-size: 0.95rem !important;
             font-weight: 700 !important;
             line-height: 1.3 !important;
             margin: 0.15rem 0 0.25rem 0 !important;
-            color: #1E293B !important;
+            color: #0F2756 !important;
+        }
+        h4, [data-testid="stHeadingWithActionElements"] h4 {
+            font-size: 0.88rem !important;
+            font-weight: 700 !important;
+            color: #1E3A8A !important;
         }
         p, span, label, [data-testid="stMarkdownContainer"] p {
             font-size: 13px !important;
-            line-height: 1.45 !important;
-            color: #1E293B;
+            line-height: 1.48 !important;
+            color: #334155;
         }
         small, .caption, [data-testid="stImageCaption"] {
             font-size: 11.5px !important;
             color: #64748B !important;
-            line-height: 1.3 !important;
+            line-height: 1.35 !important;
         }
         
-        /* 5. Sidebar: Restored Smooth Scrolling & Generous Proportional Spacing */
-        section[data-testid="stSidebar"],
-        [data-testid="stSidebar"],
-        div[data-testid="stSidebarUserContent"] {
-            width: 285px !important;
-            min-width: 280px !important;
-            max-width: 290px !important;
+        /* 5. Sidebar: Flexible Resizing & Smooth Scrolling */
+        section[data-testid="stSidebar"] {
+            min-width: 270px !important;
+            max-width: 520px !important;
             background-color: #FFFFFF !important;
             border-right: 1px solid #E2E8F0 !important;
-            box-shadow: 4px 0 16px rgba(43, 89, 237, 0.03) !important;
+            box-shadow: 4px 0 20px rgba(15, 23, 42, 0.04) !important;
             overflow-y: auto !important;
             overflow-x: hidden !important;
         }
+        div[data-testid="stSidebarUserContent"] {
+            width: 100% !important;
+            min-width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            border: none !important;
+            background: transparent !important;
+        }
         [data-testid="stSidebarContent"] {
-            padding-top: 2.0rem !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            padding-top: 1.2rem !important;
             padding-bottom: 3.5rem !important;
-            padding-left: 1.30rem !important;
-            padding-right: 1.30rem !important;
+            padding-left: 1.25rem !important;
+            padding-right: 1.25rem !important;
             overflow-y: auto !important;
             overflow-x: hidden !important;
         }
@@ -424,20 +524,23 @@ st.markdown("""
             padding: 10px 14px !important;
             font-size: 13px !important;
             font-weight: 700 !important;
-            border-radius: 10px !important;
+            border-radius: 12px !important;
+            width: 100% !important;
         }
         
         /* Medcare Sidebar Brand Badge */
         .medcare-sidebar-brand {
             display: flex;
             align-items: center;
-            gap: 10px;
-            background: linear-gradient(135deg, #2B59ED 0%, #3B71F7 100%);
+            gap: 12px;
+            background: linear-gradient(135deg, #1E3A8A 0%, #2B59ED 100%);
             padding: 12px 14px;
-            border-radius: 12px;
+            border-radius: 14px;
             color: #FFFFFF !important;
             margin-bottom: 22px;
-            box-shadow: 0 4px 14px rgba(43, 89, 237, 0.2);
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 4px 14px rgba(43, 89, 237, 0.22);
         }
         .medcare-sidebar-brand h2 {
             color: #FFFFFF !important;
@@ -448,24 +551,24 @@ st.markdown("""
             line-height: 1.1;
         }
         
-        /* 6. Medcare Cards & Containers */
+        /* 6. Medcare Cards & Containers (Smooth Rounded Edges) */
         .medcare-card {
             background: #FFFFFF;
             border-radius: 14px;
-            border: 1px solid #E9EFF7;
-            padding: 12px 14px;
-            box-shadow: 0 2px 10px rgba(43, 89, 237, 0.04);
+            border: 1px solid #E2E8F0;
+            padding: 14px 16px;
+            box-shadow: 0 3px 12px rgba(43, 89, 237, 0.05);
             margin-bottom: 12px;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .medcare-card:hover {
-            box-shadow: 0 4px 16px rgba(43, 89, 237, 0.08);
+            box-shadow: 0 6px 18px rgba(43, 89, 237, 0.09);
         }
         .medcare-card * {
             color: #1E293B !important;
         }
         .medcare-card p {
-            color: #475569 !important;
+            color: #334155 !important;
         }
         
         /* 7. Buttons: Royal Blue Pill */
@@ -474,12 +577,12 @@ st.markdown("""
             background: linear-gradient(135deg, #2B59ED 0%, #3B71F7 100%) !important;
             color: #FFFFFF !important;
             border: none !important;
-            border-radius: 10px !important;
-            min-height: 32px !important;
-            height: 32px !important;
-            padding: 3px 12px !important;
-            font-weight: 600 !important;
-            font-size: 12.5px !important;
+            border-radius: 12px !important;
+            min-height: 34px !important;
+            height: 34px !important;
+            padding: 4px 14px !important;
+            font-weight: 700 !important;
+            font-size: 13px !important;
             letter-spacing: -0.01em !important;
             box-shadow: 0 3px 10px rgba(43, 89, 237, 0.2) !important;
             transition: all 0.2s ease-in-out !important;
@@ -490,71 +593,108 @@ st.markdown("""
             color: #FFFFFF !important;
         }
         
-        /* Secondary Category Buttons */
+        /* Secondary Category Buttons (Clinical Normal & DR) */
         button[key="btn_side_norm"], button[key="btn_w_norm"] {
-            background: #FFFFFF !important;
-            color: #10B981 !important;
-            border: 1.5px solid #10B981 !important;
-            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.12) !important;
+            background: #F0FDF4 !important;
+            color: #065F46 !important;
+            border: 1.5px solid #A7F3D0 !important;
+            border-radius: 12px !important;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.08) !important;
         }
         button[key="btn_side_norm"]:hover, button[key="btn_w_norm"]:hover {
-            background: #E6F9F2 !important;
-            color: #059669 !important;
+            background: #DCFCE7 !important;
+            border-color: #34D399 !important;
+            color: #047857 !important;
         }
         button[key="btn_side_dr"], button[key="btn_w_dr"] {
-            background: #FFFFFF !important;
-            color: #EF4444 !important;
-            border: 1.5px solid #EF4444 !important;
-            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.12) !important;
+            background: #FEF2F2 !important;
+            color: #991B1B !important;
+            border: 1.5px solid #FECACA !important;
+            border-radius: 12px !important;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.08) !important;
         }
         button[key="btn_side_dr"]:hover, button[key="btn_w_dr"]:hover {
-            background: #FEECEB !important;
-            color: #DC2626 !important;
+            background: #FEE2E2 !important;
+            border-color: #F87171 !important;
+            color: #B91C1C !important;
         }
         
-        /* 8. Tabs: Sleek Clinical Pill Tabs */
+        /* 8. Tabs: Modern Rounded Pill Tabs (No Sharp Red Underline) */
+        div[data-testid="stTabs"] div[role="tablist"],
+        div[data-testid="stTabs"] [data-baseweb="tab-list"],
         .stTabs [data-baseweb="tab-list"] {
             gap: 6px !important;
-            background-color: #EBF0F9 !important;
-            padding: 4px !important;
-            border-radius: 12px !important;
-            min-height: 32px !important;
+            background-color: #EEF2F6 !important;
+            padding: 5px !important;
+            border-radius: 14px !important;
+            border: 1px solid #E2E8F0 !important;
+            min-height: 36px !important;
+            display: inline-flex !important;
         }
+        div[data-testid="stTabs"] button[data-testid="stTab"],
+        div[data-testid="stTabs"] button[role="tab"],
+        div[data-testid="stTabs"] [data-baseweb="tab"],
         .stTabs [data-baseweb="tab"] {
-            border-radius: 9px !important;
-            padding: 5px 14px !important;
-            font-weight: 600 !important;
-            font-size: 12.5px !important;
-            color: #64748B !important;
+            border-radius: 10px !important;
+            padding: 6px 16px !important;
+            font-weight: 700 !important;
+            font-size: 13px !important;
+            color: #475569 !important;
             background-color: transparent !important;
-            border: none !important;
-            min-height: 30px !important;
-            height: 30px !important;
+            border: 1px solid transparent !important;
+            min-height: 32px !important;
+            height: 32px !important;
+            transition: all 0.2s ease !important;
         }
+        div[data-testid="stTabs"] button[data-testid="stTab"]:hover,
+        div[data-testid="stTabs"] button[role="tab"]:hover,
+        div[data-testid="stTabs"] [data-baseweb="tab"]:hover {
+            color: #2B59ED !important;
+            background-color: #F8FAFC !important;
+        }
+        div[data-testid="stTabs"] button[data-testid="stTab"][aria-selected="true"],
+        div[data-testid="stTabs"] button[role="tab"][aria-selected="true"],
+        div[data-testid="stTabs"] [aria-selected="true"],
         .stTabs [aria-selected="true"] {
             background-color: #FFFFFF !important;
             color: #2B59ED !important;
-            box-shadow: 0 2px 6px rgba(43, 89, 237, 0.12) !important;
+            border: 1.5px solid #C7D2FE !important;
+            border-radius: 10px !important;
+            box-shadow: 0 2px 8px rgba(43, 89, 237, 0.12) !important;
+        }
+        /* Completely eliminate sharp rectangular red underline */
+        div[data-testid="stTabs"] [data-baseweb="tab-highlight"],
+        div[data-testid="stTabs"] div[data-baseweb="tab-border"],
+        div[data-testid="stTabs"] [data-testid="stTabHighlight"],
+        div[data-testid="stTabs"] div[role="tablist"] hr,
+        div[data-testid="stTabs"] div[role="tablist"] > div[style*="position: absolute"],
+        div[data-testid="stTabs"] div[role="tablist"] div[role="presentation"] {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            opacity: 0 !important;
         }
         
-        /* 9. Radio Buttons as Segmented Control */
+        /* 9. Radio Buttons as Segmented Control (Smooth Rounded Edges) */
         div[data-testid="stRadio"] > div {
-            background-color: #EBF0F9;
-            padding: 3px;
-            border-radius: 10px;
-            gap: 3px;
+            background-color: #EEF2F6;
+            padding: 4px;
+            border-radius: 12px;
+            gap: 4px;
+            border: 1px solid #E2E8F0;
         }
         div[data-testid="stRadio"] label {
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 12px;
+            padding: 5px 12px;
+            border-radius: 9px;
+            font-weight: 700;
+            font-size: 12.5px;
             color: #475569 !important;
+            transition: all 0.15s ease;
         }
         div[data-testid="stRadio"] label[data-checked="true"] {
             background-color: #FFFFFF;
             color: #2B59ED !important;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 6px rgba(43, 89, 237, 0.1);
         }
 
         /* 9b. Clean Light-Themed File Uploader (Zero Dark Backgrounds) */
@@ -644,23 +784,26 @@ st.markdown("""
         /* Social Badges with Guaranteed Visibility */
         .social-badge {
             text-decoration: none !important;
-            color: #1E293B !important;
-            background-color: #F1F5F9 !important;
-            border: 1px solid #CBD5E1 !important;
-            padding: 4px 9px !important;
-            border-radius: 7px !important;
-            font-size: 0.72rem !important;
+            color: #1E3A8A !important;
+            background-color: #EEF2FF !important;
+            border: 1px solid #C7D2FE !important;
+            padding: 5px 11px !important;
+            border-radius: 10px !important;
+            font-size: 0.74rem !important;
             font-weight: 700 !important;
             display: inline-flex !important;
             align-items: center !important;
-            gap: 4px !important;
+            gap: 6px !important;
             cursor: pointer !important;
             transition: all 0.15s ease-in-out !important;
         }
         .social-badge:hover {
-            background-color: #E2E8F0 !important;
-            color: #2B59ED !important;
-            border-color: #94A3B8 !important;
+            background-color: #E0E7FF !important;
+            color: #1D4ED8 !important;
+            border-color: #818CF8 !important;
+        }
+        .social-badge svg {
+            fill: #1E3A8A !important;
         }
 
         /* 11. Medcare Hero Banner & KPI Components (Compact Sizing) */
@@ -709,13 +852,13 @@ st.markdown("""
         .medcare-badge-live {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             background: rgba(255, 255, 255, 0.18);
             border: 1px solid rgba(255, 255, 255, 0.3);
             color: #FFFFFF !important;
             font-size: 0.68rem;
             font-weight: 700;
-            padding: 2px 8px;
+            padding: 3px 9px;
             border-radius: 20px;
             letter-spacing: 0.04em;
             margin-bottom: 6px;
@@ -746,13 +889,13 @@ st.markdown("""
             font-weight: 700;
             text-transform: uppercase;
             color: #64748B !important;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.04em;
             margin-bottom: 2px;
         }
         .kpi-val {
             font-size: 1.20rem;
             font-weight: 800;
-            color: #1E293B !important;
+            color: #0F2756 !important;
             line-height: 1.1;
             margin-bottom: 4px;
         }
@@ -784,32 +927,32 @@ st.markdown("""
         /* 12. Medcare Patient Study Header & Diagnosis Cards */
         .medcare-study-header {
             background: #FFFFFF;
-            border-radius: 12px;
-            padding: 10px 16px;
-            border: 1px solid #E9EFF7;
+            border-radius: 14px;
+            padding: 12px 18px;
+            border: 1px solid #E2E8F0;
             display: flex;
             flex-wrap: wrap;
-            gap: 18px;
+            gap: 20px;
             align-items: center;
             margin-bottom: 14px;
-            box-shadow: 0 2px 6px rgba(43, 89, 237, 0.04);
+            box-shadow: 0 2px 8px rgba(43, 89, 237, 0.04);
         }
         .study-meta-item {
             display: flex;
             flex-direction: column;
-            gap: 1px;
+            gap: 2px;
         }
         .meta-label {
             font-size: 0.64rem;
             font-weight: 700;
-            color: #94A3B8 !important;
+            color: #64748B !important;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.05em;
         }
         .meta-val {
-            font-size: 0.82rem;
+            font-size: 0.84rem;
             font-weight: 700;
-            color: #1E293B !important;
+            color: #0F2756 !important;
         }
         
         .diagnosis-card-dr {
@@ -817,11 +960,11 @@ st.markdown("""
             border-radius: 14px;
             border: 1px solid #FEE2E2;
             border-left: 5px solid #EF4444;
-            padding: 14px 16px;
+            padding: 14px 18px;
             box-shadow: 0 3px 12px rgba(239, 68, 68, 0.08);
             display: flex;
             align-items: flex-start;
-            gap: 12px;
+            gap: 14px;
             min-height: 115px;
         }
         .diagnosis-card-normal {
@@ -829,11 +972,11 @@ st.markdown("""
             border-radius: 14px;
             border: 1px solid #D1FAE5;
             border-left: 5px solid #10B981;
-            padding: 14px 16px;
+            padding: 14px 18px;
             box-shadow: 0 3px 12px rgba(16, 185, 129, 0.08);
             display: flex;
             align-items: flex-start;
-            gap: 12px;
+            gap: 14px;
             min-height: 115px;
         }
         
@@ -841,8 +984,8 @@ st.markdown("""
         .biomarker-card {
             background: #FFFFFF;
             border-radius: 14px;
-            border: 1px solid #E9EFF7;
-            padding: 10px 14px;
+            border: 1px solid #E2E8F0;
+            padding: 12px 16px;
             box-shadow: 0 2px 8px rgba(43, 89, 237, 0.04);
             height: 100%;
             display: flex;
@@ -858,7 +1001,7 @@ st.markdown("""
         .biomarker-name {
             font-size: 0.74rem;
             font-weight: 600;
-            color: #475569 !important;
+            color: #334155 !important;
         }
         .biomarker-bar-bg {
             background-color: #F1F5F9;
@@ -882,18 +1025,28 @@ full_model, feature_extractor, scaler, svm, load_error = load_models()
 with st.sidebar:
     st.markdown("""
     <div class="medcare-sidebar-brand">
-        <span style="font-size: 1.15rem;">👁️</span>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+            <circle cx="12" cy="12" r="3"/>
+        </svg>
         <div>
             <h2>RetinaAI Care</h2>
-            <div style="font-size: 0.64rem; opacity: 0.9; font-weight: 600;">CLINICAL DECISION SYSTEM</div>
+            <div style="font-size: 0.64rem; opacity: 0.9; font-weight: 600; letter-spacing: 0.04em;">CLINICAL DECISION SYSTEM</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("<div style='font-size: 0.78rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.04em; margin: 26px 0 12px 0;'>📁 Fundus Input Source</div>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style='display: flex; align-items: center; gap: 7px; font-size: 0.76rem; font-weight: 800; color: #1E3A8A; text-transform: uppercase; letter-spacing: 0.05em; margin: 26px 0 12px 0;'>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2B59ED" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/>
+        </svg>
+        <span>Fundus Input Source</span>
+    </div>
+    """, unsafe_allow_html=True)
     input_mode = st.radio(
         "Choose Input Source",
-        ["📤 Upload Image", "🖼️ Preloaded Sample Cases"],
+        ["Upload Image", "Preloaded Clinical Cases"],
         horizontal=True,
         label_visibility="collapsed"
     )
@@ -903,7 +1056,7 @@ with st.sidebar:
     is_already_preprocessed = False
     validation_error = None
     
-    if input_mode == "📤 Upload Image":
+    if input_mode == "Upload Image":
         st.markdown("<div style='margin-top: 14px;'></div>", unsafe_allow_html=True)
         uploaded_file = st.file_uploader(
             "Upload a retinal fundus image (.jpg, .jpeg, .png)",
@@ -917,15 +1070,25 @@ with st.sidebar:
             except Exception as e:
                 validation_error = f"Failed to parse image file: {str(e)}"
     else:
-        st.markdown("<div style='font-size: 0.78rem; color: #475569; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; margin: 24px 0 12px 0;'>🔬 Clinical Samples:</div>", unsafe_allow_html=True)
+        st.markdown("""
+        <div style='display: flex; align-items: center; gap: 7px; font-size: 0.76rem; font-weight: 800; color: #1E3A8A; text-transform: uppercase; letter-spacing: 0.05em; margin: 24px 0 12px 0;'>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2B59ED" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m16 6 4 14"/>
+                <path d="M12 6v14"/>
+                <path d="M8 8v12"/>
+                <path d="M4 4v16"/>
+            </svg>
+            <span>Clinical Sample Library</span>
+        </div>
+        """, unsafe_allow_html=True)
         
-        btn_normal = st.button("🟢 Normal Images", use_container_width=True, key="btn_side_norm")
-        btn_dr = st.button("🔴 Diabetic Retinopathy Cases", use_container_width=True, key="btn_side_dr")
+        btn_normal = st.button("Normal Retina Cases", use_container_width=True, key="btn_side_norm")
+        btn_dr = st.button("Diabetic Retinopathy Cases", use_container_width=True, key="btn_side_dr")
         
         if btn_normal:
-            show_sample_gallery_dialog("🟢 Normal Retina Cases", ORIGINAL_NORMAL_CASES)
+            show_sample_gallery_dialog("Normal Retina Cases", ORIGINAL_NORMAL_CASES)
         elif btn_dr:
-            show_sample_gallery_dialog("🔴 Diabetic Retinopathy Cases", ORIGINAL_DR_CASES)
+            show_sample_gallery_dialog("Diabetic Retinopathy Cases", ORIGINAL_DR_CASES)
             
         if st.session_state.get("selected_sample_path"):
             sample_path = st.session_state.selected_sample_path
@@ -935,12 +1098,12 @@ with st.sidebar:
                     active_source_label = st.session_state.selected_sample_label
                     
                     st.markdown("""
-                    <div style='background: #EEF2FF; border: 1.5px solid #C7D2FE; border-radius: 10px; padding: 10px 12px; margin-top: 14px;'>
-                        <div style='font-size: 0.68rem; font-weight: 800; color: #2B59ED; text-transform: uppercase; letter-spacing: 0.03em;'>ACTIVE CLINICAL CASE</div>
-                        <div style='font-size: 0.80rem; font-weight: 700; color: #1E293B; word-break: break-all; margin-top: 3px;'>""" + os.path.basename(sample_path) + """</div>
+                    <div style='background: #EEF2FF; border: 1.5px solid #C7D2FE; border-radius: 12px; padding: 12px 14px; margin-top: 14px;'>
+                        <div style='font-size: 0.68rem; font-weight: 800; color: #2B59ED; text-transform: uppercase; letter-spacing: 0.04em;'>ACTIVE CLINICAL CASE</div>
+                        <div style='font-size: 0.82rem; font-weight: 700; color: #0F2756; word-break: break-all; margin-top: 4px;'>""" + os.path.basename(sample_path) + """</div>
                     </div>
                     """, unsafe_allow_html=True)
-                    if st.button("✕ Deselect Case", key="btn_reset_sample", use_container_width=True):
+                    if st.button("Clear Selected Case", key="btn_reset_sample", use_container_width=True):
                         st.session_state.selected_sample_path = None
                         st.session_state.selected_sample_label = None
                         st.rerun()
@@ -956,17 +1119,33 @@ with st.sidebar:
             validation_error = validation_msg
             
     st.markdown("<div style='border-top: 1.5px solid #E2E8F0; margin: 34px 0 24px 0;'></div>", unsafe_allow_html=True)
-    st.markdown("<div style='font-size: 0.78rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 12px;'>📬 Developer & Support</div>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style='display: flex; align-items: center; gap: 7px; font-size: 0.76rem; font-weight: 800; color: #1E3A8A; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;'>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2B59ED" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <span>Developer & Support</span>
+    </div>
+    """, unsafe_allow_html=True)
     
-    # Custom HTML for social links (styled with clean, high-contrast badges)
+    # Custom HTML for social links (styled with clean, high-contrast badges with genuine SVG brand icons)
     st.markdown(
         """
         <div style="display: flex; gap: 10px; margin-bottom: 16px;">
             <a href="https://github.com/Avinash00006" target="_blank" class="social-badge">
-                🐙 GitHub
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12Z"/>
+                </svg>
+                <span>GitHub</span>
             </a>
             <a href="https://linkedin.com/in/avinash-koneti" target="_blank" class="social-badge">
-                🔗 LinkedIn
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451c.979 0 1.778-.773 1.778-1.729V1.73C24 .774 23.205 0 22.222 0h.003z"/>
+                </svg>
+                <span>LinkedIn</span>
             </a>
         </div>
         """,
@@ -977,7 +1156,7 @@ with st.sidebar:
     if "message_sent" not in st.session_state:
         st.session_state.message_sent = False
         
-    btn_contact_text = "✉️ Message Developer" if not st.session_state.message_sent else "✓ Message Delivered"
+    btn_contact_text = "Message Developer" if not st.session_state.message_sent else "Message Delivered"
     if st.button(btn_contact_text, use_container_width=True, key="btn_open_contact"):
         show_contact_dialog()
             
@@ -986,7 +1165,7 @@ with st.sidebar:
 
 # Handle potential asset loading errors gracefully
 if load_error is not None:
-    st.error("⚠️ **Application Initialization Failure**")
+    st.error("Application Initialization Failure")
     st.markdown(f"**Reason:** {load_error}")
     st.warning("Please ensure the ML weights are placed inside the project structure as follows:")
     st.code("""
@@ -1007,13 +1186,22 @@ if active_image is None:
     st.markdown("""
     <div class="medcare-hero-banner">
         <div style="flex: 1; z-index: 1;">
-            <div class="medcare-badge-live">🟢 CLINICAL WORKSTATION READY</div>
-            <h2 style="font-size: 1.22rem; font-weight: 800; color: #FFFFFF !important; margin: 2px 0 4px 0; letter-spacing: -0.02em;">Good Day, Clinician! 👋</h2>
-            <p style="color: rgba(255, 255, 255, 0.94) !important; font-size: 0.80rem; line-height: 1.42; margin: 0; max-width: 680px;">
+            <div class="medcare-badge-live">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background-color: #34D399; display: inline-block;"></span>
+                <span>CLINICAL WORKSTATION READY</span>
+            </div>
+            <h2 style="font-size: 1.25rem; font-weight: 800; color: #FFFFFF !important; margin: 2px 0 4px 0; letter-spacing: -0.02em;">Good Day, Clinician</h2>
+            <p style="color: rgba(255, 255, 255, 0.94) !important; font-size: 0.82rem; line-height: 1.45; margin: 0; max-width: 680px;">
                 Welcome to <b>RetinaAI Care</b> workstation. Automated ophthalmic fundus screening powered by hybrid EfficientNetV2-S deep feature extraction, Support Vector Machines, and Explainable AI (Grad-CAM & LIME).
             </p>
         </div>
-        <div style="font-size: 2.0rem; margin-left: 18px; opacity: 0.92; z-index: 1;">👁️‍🗨️</div>
+        <div style="margin-left: 18px; opacity: 0.92; z-index: 1;">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                <circle cx="12" cy="12" r="3"/>
+                <circle cx="12" cy="12" r="1" fill="#FFFFFF"/>
+            </svg>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -1062,7 +1250,7 @@ if active_image is None:
                 <div class="kpi-val">&lt; 1.2s</div>
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span class="kpi-badge-positive">⚡ Real-time</span>
+                <span class="kpi-badge-positive">Real-time</span>
                 <svg width="60" height="20" viewBox="0 0 60 20">
                     <path d="M 0 14 Q 25 10, 45 4 T 60 2" fill="none" stroke="#F59E0B" stroke-width="2.2" stroke-linecap="round"/>
                 </svg>
@@ -1077,10 +1265,15 @@ if active_image is None:
         st.markdown("""
         <div class="medcare-card">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                <span style="background: #EBF0F9; padding: 4px 7px; border-radius: 8px; font-size: 0.95rem;">📋</span>
-                <span style="font-weight: 700; font-size: 0.84rem; color: #1E293B !important;">1. Quality Assurance</span>
+                <div style="background: #EEF2FF; padding: 5px; border-radius: 8px; display: inline-flex;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2B59ED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 11l3 3L22 4"/>
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                    </svg>
+                </div>
+                <span style="font-weight: 700; font-size: 0.85rem; color: #0F2756 !important;">1. Quality Assurance</span>
             </div>
-            <p style="font-size: 0.76rem; color: #64748B !important; margin: 0; line-height: 1.4;">
+            <p style="font-size: 0.76rem; color: #475569 !important; margin: 0; line-height: 1.45;">
                 Automated pre-flight validation analyzing aspect ratio, circular aperture coverage, and illumination metrics before pipeline inference.
             </p>
         </div>
@@ -1089,10 +1282,16 @@ if active_image is None:
         st.markdown("""
         <div class="medcare-card">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                <span style="background: #EBF0F9; padding: 4px 7px; border-radius: 8px; font-size: 0.95rem;">🧠</span>
-                <span style="font-weight: 700; font-size: 0.84rem; color: #1E293B !important;">2. Deep Feature Classifier</span>
+                <div style="background: #EEF2FF; padding: 5px; border-radius: 8px; display: inline-flex;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2B59ED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="18" height="18" x="3" y="3" rx="2"/>
+                        <path d="m9 9 6 6"/>
+                        <path d="m15 9-6 6"/>
+                    </svg>
+                </div>
+                <span style="font-weight: 700; font-size: 0.85rem; color: #0F2756 !important;">2. Deep Feature Classifier</span>
             </div>
-            <p style="font-size: 0.76rem; color: #64748B !important; margin: 0; line-height: 1.4;">
+            <p style="font-size: 0.76rem; color: #475569 !important; margin: 0; line-height: 1.45;">
                 EfficientNetV2-S deep convolutional backbone extracts 1,280 structural features, classified with an RBF Support Vector Machine.
             </p>
         </div>
@@ -1101,10 +1300,16 @@ if active_image is None:
         st.markdown("""
         <div class="medcare-card">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                <span style="background: #EBF0F9; padding: 4px 7px; border-radius: 8px; font-size: 0.95rem;">🔬</span>
-                <span style="font-weight: 700; font-size: 0.84rem; color: #1E293B !important;">3. Interpretability (XAI)</span>
+                <div style="background: #EEF2FF; padding: 5px; border-radius: 8px; display: inline-flex;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2B59ED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                </div>
+                <span style="font-weight: 700; font-size: 0.85rem; color: #0F2756 !important;">3. Interpretability (XAI)</span>
             </div>
-            <p style="font-size: 0.76rem; color: #64748B !important; margin: 0; line-height: 1.4;">
+            <p style="font-size: 0.76rem; color: #475569 !important; margin: 0; line-height: 1.45;">
                 Dual Explainable AI: Grad-CAM generates convolutional attention heatmaps, and LIME bounds influential superpixels.
             </p>
         </div>
@@ -1114,7 +1319,7 @@ if active_image is None:
 else:
     # 1. Handle validation errors immediately on main canvas
     if validation_error is not None:
-        st.error(f"❌ **Invalid Image**: {validation_error}")
+        st.error(f"Invalid Image: {validation_error}")
         st.stop()
         
     # 2. Render Medical Report Header (Medcare Patient Study Bar)
@@ -1139,8 +1344,9 @@ else:
             </div>
             <div class="study-meta-item" style="margin-left: auto;">
                 <span class="meta-label">PACS STATUS</span>
-                <span style="font-size: 0.78rem; font-weight: 700; color: #10B981; background: #E6F9F2; padding: 3px 10px; border-radius: 12px; display: inline-flex; align-items: center; gap: 4px;">
-                    ● CONNECTED
+                <span style="font-size: 0.76rem; font-weight: 700; color: #065F46; background: #DCFCE7; border: 1px solid #A7F3D0; padding: 4px 10px; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px;">
+                    <span style="width: 7px; height: 7px; border-radius: 50%; background-color: #10B981; display: inline-block;"></span>
+                    CONNECTED
                 </span>
             </div>
         </div>
@@ -1172,8 +1378,9 @@ else:
     col_status, col_conf, col_biomarkers = st.columns([1.7, 0.95, 1.35])
     
     if prediction == 1:
-        icon = "🚨"
+        icon_svg = """<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>"""
         title = "Diabetic Retinopathy (DR) Detected"
+        title_color = "#991B1B"
         desc = "Microvascular abnormalities, microaneurysms, or hemorrhagic patterns identified in retinal vasculature. Comprehensive clinical evaluation and optical coherence tomography (OCT) follow-up recommended."
         badge_text = "POSITIVE SCREENING"
         badge_bg = "#FEE2E2"
@@ -1191,8 +1398,9 @@ else:
         macula_color = "#EF4444"
         macula_text = "Review Advised"
     else:
-        icon = "✅"
+        icon_svg = """<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>"""
         title = "No Diabetic Retinopathy Found"
+        title_color = "#0F2756"
         desc = "Retinal structure mapping presents normal vascular distribution. Exudates, hemorrhages, and microaneurysms are absent or lie within SVM decision margins. Periodic screening advised."
         badge_text = "NEGATIVE SCREENING"
         badge_bg = "#E6F9F2"
@@ -1214,13 +1422,13 @@ else:
         st.markdown(
             f"""
             <div class="{card_class}">
-                <span style="font-size: 2.2rem; line-height: 1;">{icon}</span>
+                <div style="margin-top: 2px;">{icon_svg}</div>
                 <div style="flex: 1;">
                     <div style="margin-bottom: 4px;">
                         <span style="font-size: 0.68rem; font-weight: 700; color: {badge_color}; background: {badge_bg}; padding: 2px 8px; border-radius: 12px; letter-spacing: 0.04em;">{badge_text}</span>
                     </div>
-                    <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: #1E293B; line-height: 1.25;">{title}</h3>
-                    <p style="margin: 6px 0 0 0; font-size: 0.82rem; line-height: 1.45; color: #475569;">{desc}</p>
+                    <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: {title_color}; line-height: 1.25;">{title}</h3>
+                    <p style="margin: 6px 0 0 0; font-size: 0.82rem; line-height: 1.48; color: #334155;">{desc}</p>
                 </div>
             </div>
             """, 
@@ -1231,7 +1439,7 @@ else:
         # SVG Circular Gradient Donut Gauge
         circumference = 301.6
         dash_offset = circumference * (1 - confidence / 100.0)
-        rel_label = "★ High Reliability" if confidence >= 75 else "★ Moderate Reliability"
+        rel_label = "Clinical Reliability: High" if confidence >= 75 else "Clinical Reliability: Moderate"
         
         st.markdown(
             f"""
@@ -1247,10 +1455,10 @@ else:
                     <circle cx="60" cy="60" r="48" fill="none" stroke="url(#medcareGaugeGrad)" stroke-width="10" 
                             stroke-dasharray="{circumference}" stroke-dashoffset="{dash_offset}" stroke-linecap="round"
                             transform="rotate(-90 60 60)"></circle>
-                    <text x="60" y="58" text-anchor="middle" font-family="'Plus Jakarta Sans', -apple-system, sans-serif" font-weight="800" font-size="21" fill="#1E293B">{confidence}%</text>
-                    <text x="60" y="73" text-anchor="middle" font-family="'Plus Jakarta Sans', -apple-system, sans-serif" font-weight="700" font-size="9" fill="#94A3B8" letter-spacing="0.05em">CONFIDENCE</text>
+                    <text x="60" y="58" text-anchor="middle" font-family="'Plus Jakarta Sans', -apple-system, sans-serif" font-weight="800" font-size="21" fill="#0F2756">{confidence}%</text>
+                    <text x="60" y="73" text-anchor="middle" font-family="'Plus Jakarta Sans', -apple-system, sans-serif" font-weight="700" font-size="9" fill="#64748B" letter-spacing="0.05em">CONFIDENCE</text>
                 </svg>
-                <div style="margin-top: 4px; font-size: 0.68rem; font-weight: 700; color: #2B59ED; background: #EEF2FF; padding: 2px 8px; border-radius: 10px;">
+                <div style="margin-top: 4px; font-size: 0.68rem; font-weight: 700; color: #2B59ED; background: #EEF2FF; border: 1px solid #C7D2FE; padding: 2px 8px; border-radius: 10px;">
                     {rel_label}
                 </div>
             </div>
@@ -1262,7 +1470,7 @@ else:
         st.markdown(
             f"""
             <div class="biomarker-card">
-                <div style="font-size: 0.72rem; font-weight: 800; color: #1E293B; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px;">
+                <div style="font-size: 0.72rem; font-weight: 800; color: #0F2756; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px;">
                     BIOMARKER RISK PROFILE
                 </div>
                 <div style="margin-bottom: 5px;">
@@ -1301,14 +1509,14 @@ else:
 
     # Section 2: Clinical Dashboard Tabs (Visualizations & Explainability)
     tab_prep, tab_cam, tab_lime = st.tabs([
-        "⚙️ Preprocessed View",
-        "📊 Diagnostic Heatmap (Grad-CAM)", 
-        "🔬 Local Explanations (LIME)"
+        "Preprocessed View",
+        "Diagnostic Heatmap (Grad-CAM)", 
+        "Local Explanations (LIME)"
     ])
     
     # --- Tab 1: Preprocessing view ---
     with tab_prep:
-        st.markdown("### ⚙️ Fundus Image Normalization (Ben Graham's Method)")
+        st.markdown("<h3 style='color: #0F2756 !important; font-weight: 800; margin: 0 0 4px 0;'>Fundus Image Normalization (Ben Graham's Method)</h3>", unsafe_allow_html=True)
         st.caption(
             "Retinal fundus photographs often exhibit light reflections and poor contrast. "
             "Applying local Gaussian mean subtraction corrects spatial color and emphasizes vessels/lesions."
@@ -1323,18 +1531,18 @@ else:
         with col_p_desc:
             st.markdown("""
             <div class="medcare-card" style="padding: 14px 16px;">
-                <h4 style="margin: 0 0 8px 0; font-size: 0.95rem; font-weight: 700; color: #1E293B;">🔬 Clinical Significance</h4>
-                <ul style="margin: 0; padding-left: 18px; font-size: 0.8rem; color: #475569; line-height: 1.55;">
-                    <li><b>Contrast Standardization</b>: Eliminates non-uniform lighting across retina boundaries.</li>
-                    <li><b>Diagnostic Prep</b>: Sharpens micro-aneurysms and hard lipid exudates.</li>
-                    <li><b>Classifier Stability</b>: Stabilizes input variance before SVM boundary scoring.</li>
+                <h4 style="margin: 0 0 8px 0; font-size: 0.95rem; font-weight: 700; color: #0F2756;">Clinical Significance</h4>
+                <ul style="margin: 0; padding-left: 18px; font-size: 0.8rem; color: #334155; line-height: 1.55;">
+                    <li><b style="color: #1E3A8A;">Contrast Standardization</b>: Eliminates non-uniform lighting across retina boundaries.</li>
+                    <li><b style="color: #1E3A8A;">Diagnostic Prep</b>: Sharpens micro-aneurysms and hard lipid exudates.</li>
+                    <li><b style="color: #1E3A8A;">Classifier Stability</b>: Stabilizes input variance before SVM boundary scoring.</li>
                 </ul>
             </div>
             """, unsafe_allow_html=True)
 
     # --- Tab 2: Grad-CAM ---
     with tab_cam:
-        st.markdown("### 🔎 Convolutional Feature Saliency Map")
+        st.markdown("<h3 style='color: #0F2756 !important; font-weight: 800; margin: 0 0 4px 0;'>Convolutional Feature Saliency Map</h3>", unsafe_allow_html=True)
         st.caption(
             "Grad-CAM calculates gradients relative to the final convolutional block of the EfficientNetV2-S "
             "model to visualize where the deep neural network focused while extracting features."
@@ -1373,11 +1581,11 @@ else:
         with col_desc:
             st.markdown("""
             <div class="medcare-card" style="padding: 14px 16px;">
-                <h4 style="margin: 0 0 8px 0; font-size: 0.95rem; font-weight: 700; color: #1E293B;">🎯 Heatmap Interpretation</h4>
-                <ul style="margin: 0; padding-left: 18px; font-size: 0.8rem; color: #475569; line-height: 1.55;">
-                    <li>🔴 <b>Red / Orange Saliency</b>: Primary focal attention regions guiding feature weights.</li>
-                    <li>🟡 <b>Yellow / Green Saliency</b>: Secondary contextual regions.</li>
-                    <li>🔵 <b>Blue Saliency</b>: Inactive background structures.</li>
+                <h4 style="margin: 0 0 8px 0; font-size: 0.95rem; font-weight: 700; color: #0F2756;">Heatmap Interpretation</h4>
+                <ul style="margin: 0; padding-left: 18px; font-size: 0.8rem; color: #334155; line-height: 1.55;">
+                    <li><span style="display:inline-block; width:9px; height:9px; border-radius:50%; background:#EF4444; margin-right:5px;"></span> <b style="color: #1E3A8A;">Red / Orange Saliency</b>: Primary focal attention regions guiding feature weights.</li>
+                    <li><span style="display:inline-block; width:9px; height:9px; border-radius:50%; background:#EAB308; margin-right:5px;"></span> <b style="color: #1E3A8A;">Yellow / Green Saliency</b>: Secondary contextual regions.</li>
+                    <li><span style="display:inline-block; width:9px; height:9px; border-radius:50%; background:#3B82F6; margin-right:5px;"></span> <b style="color: #1E3A8A;">Blue Saliency</b>: Inactive background structures.</li>
                 </ul>
                 <p style="margin: 10px 0 0 0; font-size: 0.74rem; color: #64748B; font-style: italic;">
                     *Grad-CAM reflects model activation distribution and is intended for clinical decision assistance.
@@ -1387,7 +1595,7 @@ else:
 
     # --- Tab 3: LIME ---
     with tab_lime:
-        st.markdown("### 🧠 Local Interpretable Model-agnostic Explanations (LIME)")
+        st.markdown("<h3 style='color: #0F2756 !important; font-weight: 800; margin: 0 0 4px 0;'>Local Interpretable Model-agnostic Explanations (LIME)</h3>", unsafe_allow_html=True)
         st.caption(
             "LIME segments the fundus image into superpixels (homogeneous regions), perturbs them "
             "randomly, and queries the SVM to see how predictions shift. Highlighted sections indicate the features "
@@ -1407,7 +1615,7 @@ else:
                 help="Higher values give clearer/more stable local explanations but take longer to process."
             )
         
-        if st.button("🔍 Run LIME Perturbation Analysis", key="run_lime"):
+        if st.button("Run LIME Perturbation Analysis", key="run_lime"):
             # Create a progress placeholder that clears on completion
             progress_placeholder = st.empty()
             with progress_placeholder.container():
@@ -1448,15 +1656,15 @@ else:
             with col_lime_info:
                 st.markdown(f"""
                 <div class="medcare-card" style="padding: 14px 16px;">
-                    <h4 style="margin: 0 0 8px 0; font-size: 0.95rem; font-weight: 700; color: #1E293B;">🧪 Superpixel Explanation</h4>
-                    <ul style="margin: 0; padding-left: 18px; font-size: 0.8rem; color: #475569; line-height: 1.55;">
-                        <li>🟡 <b>Yellow Contours</b>: Isolated superpixels with highest statistical weight driving the prediction.</li>
+                    <h4 style="margin: 0 0 8px 0; font-size: 0.95rem; font-weight: 700; color: #0F2756;">Superpixel Explanation</h4>
+                    <ul style="margin: 0; padding-left: 18px; font-size: 0.8rem; color: #334155; line-height: 1.55;">
+                        <li><span style="display:inline-block; width:9px; height:9px; border-radius:50%; background:#EAB308; margin-right:5px;"></span> <b style="color: #1E3A8A;">Yellow Contours</b>: Isolated superpixels with highest statistical weight driving the prediction.</li>
                         <li>Clinically, look for boundaries tracking <b>exudates</b>, <b>hemorrhages</b>, or <b>macular changes</b>.</li>
                     </ul>
-                    <div style="margin-top: 10px; font-size: 0.72rem; color: #10B981; font-weight: 700; background: #E6F9F2; padding: 4px 8px; border-radius: 8px; display: inline-block;">
-                        ✓ Completed with {lime_samples} perturbation samples
+                    <div style="margin-top: 10px; font-size: 0.72rem; color: #065F46; font-weight: 700; background: #DCFCE7; border: 1px solid #A7F3D0; padding: 4px 8px; border-radius: 8px; display: inline-block;">
+                        Completed with {lime_samples} perturbation samples
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
         else:
-            st.info("💡 **Clinical Recommendation**: Click the button above to run local superpixel feature analysis (LIME). This generates mathematical proof of local retinal features driving the SVM prediction. (Computation time: ~5-15 seconds depending on sample size)")
+            st.info("Clinical Recommendation: Click the button above to run local superpixel feature analysis (LIME). This generates mathematical proof of local retinal features driving the SVM prediction. (Computation time: ~5-15 seconds depending on sample size)")
