@@ -33,29 +33,64 @@ ORIGINAL_DR_CASES = {
 
 # Modal dialog for browsing real fundus images
 if hasattr(st, "dialog"):
-    @st.dialog("🖼️ Select Clinical Fundus Case", width="large")
+    @st.dialog("🖼️ Select Clinical Case", width="small")
     def show_sample_gallery_dialog(category_name, cases_dict):
-        st.markdown(f"### {category_name}")
-        st.markdown("Below are authentic, high-resolution retinal fundus photography cases. Click **Select Case** on any image to initiate immediate diagnostics:")
-        st.markdown("---")
+        st.markdown(f"#### {category_name}")
+        st.caption("Click any real fundus image below to upload and analyze:")
         
-        cols = st.columns(3)
+        # Injected CSS to make the entire image card clickable directly without a separate select button
+        st.markdown("""
+        <style>
+            div[data-testid="stDialog"] div[data-testid="stColumn"] {
+                position: relative !important;
+                border: 2px solid rgba(128, 128, 128, 0.2) !important;
+                border-radius: 10px !important;
+                padding: 6px !important;
+                text-align: center !important;
+                transition: all 0.2s ease-in-out !important;
+                background-color: rgba(128, 128, 128, 0.04) !important;
+                cursor: pointer !important;
+                margin-bottom: 10px !important;
+            }
+            div[data-testid="stDialog"] div[data-testid="stColumn"]:hover {
+                border-color: #3B82F6 !important;
+                transform: translateY(-2px) !important;
+                box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3) !important;
+            }
+            div[data-testid="stDialog"] div[data-testid="stColumn"] div.stButton {
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                z-index: 10 !important;
+            }
+            div[data-testid="stDialog"] div[data-testid="stColumn"] div.stButton button {
+                width: 100% !important;
+                height: 100% !important;
+                opacity: 0 !important;
+                cursor: pointer !important;
+                border: none !important;
+                background: transparent !important;
+            }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        cols = st.columns(2)
         for idx, (label, rel_path) in enumerate(cases_dict.items()):
             full_path = os.path.join(os.path.dirname(__file__), rel_path)
-            col = cols[idx % 3]
+            col = cols[idx % 2]
             with col:
-                with st.container(border=True):
-                    if os.path.exists(full_path):
-                        img = Image.open(full_path)
-                        st.image(img, use_container_width=True)
-                        st.markdown(f"**{label}**")
-                        file_mb = os.path.getsize(full_path) / (1024 * 1024)
-                        st.caption(f"📏 {img.size[0]}×{img.size[1]}px | 💾 {file_mb:.1f} MB")
-                    if st.button("✅ Select Case", key=f"btn_modal_{category_name}_{idx}", use_container_width=True, type="primary"):
-                        st.session_state.selected_sample_path = full_path
-                        st.session_state.selected_sample_label = f"{category_name} - {label}"
-                        st.session_state.trigger_modal_open = False
-                        st.rerun()
+                if os.path.exists(full_path):
+                    img = Image.open(full_path)
+                    st.image(img, use_container_width=True)
+                    st.markdown(f"<div style='font-size: 0.75rem; font-weight: 600; margin-top: 3px;'>{label}</div>", unsafe_allow_html=True)
+                if st.button(f"Select {label}", key=f"btn_modal_{category_name}_{idx}"):
+                    st.session_state.selected_sample_path = full_path
+                    st.session_state.selected_sample_label = f"{category_name} - {label}"
+                    st.rerun()
 else:
     def show_sample_gallery_dialog(category_name, cases_dict):
         st.session_state.fallback_gallery_open = True
@@ -178,53 +213,16 @@ with st.sidebar:
             except Exception as e:
                 validation_error = f"Failed to parse image file: {str(e)}"
     else:
-        st.markdown("<span style='font-size:0.8rem; color:#64748B; font-weight:600;'>SELECT CLINICAL CATEGORY:</span>", unsafe_allow_html=True)
-        sample_category = st.radio(
-            "Category",
-            ["🟢 Normal Retina Cases", "🔴 Diabetic Retinopathy Cases"],
-            label_visibility="collapsed",
-            key="sample_cat_radio"
-        )
+    else:
+        st.markdown("<span style='font-size:0.8rem; color:#64748B; font-weight:600;'>BROWSE CLINICAL SAMPLES:</span>", unsafe_allow_html=True)
         
-        current_cases = ORIGINAL_NORMAL_CASES if "Normal" in sample_category else ORIGINAL_DR_CASES
+        btn_normal = st.button("🟢 Normal Images", use_container_width=True, key="btn_side_norm")
+        btn_dr = st.button("🔴 Diabetic Retinopathy Cases", use_container_width=True, key="btn_side_dr")
         
-        # Check if category changed to trigger popup modal
-        if "last_sample_category" not in st.session_state:
-            st.session_state.last_sample_category = sample_category
-            st.session_state.trigger_modal_open = True
-        elif st.session_state.last_sample_category != sample_category:
-            st.session_state.last_sample_category = sample_category
-            st.session_state.trigger_modal_open = True
-            st.session_state.selected_sample_path = None
-            st.session_state.selected_sample_label = None
-
-        open_popup_btn = st.button("🖼️ Browse Real Images (Popup)", use_container_width=True, type="primary")
-        
-        # Automatically trigger dialog when category is chosen or button clicked
-        if open_popup_btn or st.session_state.get("trigger_modal_open", False):
-            st.session_state.trigger_modal_open = False
-            show_sample_gallery_dialog(sample_category, current_cases)
-
-        # Quick selector dropdown as well
-        case_options = ["-- Browse in Popup or Select --"] + list(current_cases.keys())
-        default_idx = 0
-        if st.session_state.get("selected_sample_label"):
-            for idx, opt in enumerate(case_options):
-                if opt in st.session_state.selected_sample_label:
-                    default_idx = idx
-                    break
-                    
-        case_choice = st.selectbox(
-            "Quick Select Case",
-            case_options,
-            index=default_idx,
-            label_visibility="collapsed"
-        )
-        
-        if case_choice != "-- Browse in Popup or Select --":
-            rel_path = current_cases[case_choice]
-            st.session_state.selected_sample_path = os.path.join(os.path.dirname(__file__), rel_path)
-            st.session_state.selected_sample_label = f"{sample_category} - {case_choice}"
+        if btn_normal:
+            show_sample_gallery_dialog("🟢 Normal Retina Cases", ORIGINAL_NORMAL_CASES)
+        elif btn_dr:
+            show_sample_gallery_dialog("🔴 Diabetic Retinopathy Cases", ORIGINAL_DR_CASES)
             
         if st.session_state.get("selected_sample_path"):
             sample_path = st.session_state.selected_sample_path
@@ -233,12 +231,13 @@ with st.sidebar:
                     active_image = Image.open(sample_path).convert("RGB")
                     active_source_label = st.session_state.selected_sample_label
                     
-                    # Preview thumbnail in sidebar
-                    st.image(active_image, caption=f"Active: {os.path.basename(sample_path)}", use_container_width=True)
+                    st.markdown("---")
+                    st.caption(f"**Active Case:** {os.path.basename(sample_path)}")
+                    st.image(active_image, use_container_width=True)
                     
                     with open(sample_path, "rb") as f:
                         st.download_button(
-                            label="📥 Download Original Raw File",
+                            label="📥 Download Raw PNG",
                             data=f.read(),
                             file_name=os.path.basename(sample_path),
                             mime="image/png",
@@ -383,10 +382,10 @@ if active_image is None:
         )
         col_w1, col_w2 = st.columns(2)
         with col_w1:
-            if st.button("🟢 Browse Normal Retina Cases (Popup)", use_container_width=True, type="primary", key="btn_w_norm"):
+            if st.button("🟢 Normal Images", use_container_width=True, type="primary", key="btn_w_norm"):
                 show_sample_gallery_dialog("🟢 Normal Retina Cases", ORIGINAL_NORMAL_CASES)
         with col_w2:
-            if st.button("🔴 Browse Diabetic Retinopathy Cases (Popup)", use_container_width=True, type="primary", key="btn_w_dr"):
+            if st.button("🔴 Diabetic Retinopathy Cases", use_container_width=True, type="primary", key="btn_w_dr"):
                 show_sample_gallery_dialog("🔴 Diabetic Retinopathy Cases", ORIGINAL_DR_CASES)
     else:
         st.info("💡 **Don't have a retinal photo?** Select **'🖼️ Preloaded Sample Cases'** in the sidebar to test Normal and Diabetic Retinopathy cases instantly!")
