@@ -38,13 +38,13 @@ if hasattr(st, "dialog"):
     def show_sample_gallery_dialog(category_name, cases_dict):
         st.markdown(
             f"""
-            <div style="font-size: 1.0rem; font-weight: 800; color: #FFFFFF !important; margin-bottom: 2px;">{category_name}</div>
-            <div style="font-size: 0.74rem; font-weight: 500; color: #94A3B8 !important; margin-bottom: 12px;">Click any retinal image below to load and analyze:</div>
+            <div style="font-size: 1.05rem; font-weight: 800; color: #0F172A !important; margin-bottom: 2px;">{category_name}</div>
+            <div style="font-size: 0.76rem; font-weight: 500; color: #64748B !important; margin-bottom: 14px;">Click any retinal image below to load and analyze:</div>
             """,
             unsafe_allow_html=True
         )
         
-        # Grid CSS: Half-ratio compact window, pure image tiles, zero wasted white space
+        # Grid CSS: Compact half-ratio window, ClassiAds luminous theme, zero wasted space
         st.markdown("""
         <style>
             /* Modal Surface - Compact Half Ratio (380px) */
@@ -54,30 +54,30 @@ if hasattr(st, "dialog"):
             div[role="dialog"] {
                 max-width: 380px !important;
                 width: 92vw !important;
-                background-color: #131722 !important;
-                border-radius: 16px !important;
-                border: 1px solid #334155 !important;
-                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5) !important;
-                padding: 14px 16px !important;
+                background-color: #FFFFFF !important;
+                border-radius: 20px !important;
+                border: 1px solid #E2E8F0 !important;
+                box-shadow: 0 20px 60px rgba(15, 23, 42, 0.16) !important;
+                padding: 16px 18px !important;
             }
             div[data-testid="stDialog"] div[role="dialog"] > div,
             div[data-baseweb="modal"] div[role="dialog"] > div,
             div[data-testid="stModal"] div[role="dialog"] > div,
             div[role="dialog"] > div {
-                background-color: #131722 !important;
+                background-color: #FFFFFF !important;
             }
             div[data-testid="stDialog"] h2,
             div[data-testid="stDialog"] [data-testid="stHeadingWithActionElements"] h2,
             div[role="dialog"] h2,
             div[role="dialog"] [data-testid="stHeadingWithActionElements"] h2 {
-                color: #FFFFFF !important;
+                color: #0F172A !important;
                 font-size: 1.05rem !important;
                 font-weight: 800 !important;
             }
             div[role="dialog"] button[aria-label="Close"],
             div[data-testid="stDialog"] button[aria-label="Close"] svg {
-                color: #94A3B8 !important;
-                fill: #94A3B8 !important;
+                color: #64748B !important;
+                fill: #64748B !important;
             }
 
             /* Zero Wasted Space - Pure Image Tile Container */
@@ -129,8 +129,8 @@ if hasattr(st, "dialog"):
                 max-height: 100px !important;
                 aspect-ratio: 1 / 1 !important;
                 object-fit: cover !important;
-                border-radius: 12px !important;
-                border: 2px solid #334155 !important;
+                border-radius: 14px !important;
+                border: 2px solid #E2E8F0 !important;
                 transition: all 0.2s ease-in-out !important;
                 display: block !important;
                 margin: 0 auto !important;
@@ -141,9 +141,9 @@ if hasattr(st, "dialog"):
             div[data-testid="stDialog"] div[data-testid="stColumn"]:hover img,
             div[data-baseweb="modal"] div[data-testid="stColumn"]:hover img,
             div[role="dialog"] div[data-testid="stColumn"]:hover img {
-                border-color: #3B82F6 !important;
-                transform: scale(1.05) !important;
-                box-shadow: 0 4px 16px rgba(59, 130, 246, 0.45) !important;
+                border-color: #2563EB !important;
+                transform: scale(1.04) !important;
+                box-shadow: 0 4px 16px rgba(37, 99, 235, 0.25) !important;
             }
 
             /* Case label directly below image */
@@ -162,7 +162,7 @@ if hasattr(st, "dialog"):
             div[data-testid="stDialog"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"] *,
             div[data-baseweb="modal"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"] *,
             div[role="dialog"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"] * {
-                color: #F1F5F9 !important;
+                color: #0F172A !important;
                 font-size: 0.78rem !important;
                 font-weight: 700 !important;
             }
@@ -235,7 +235,7 @@ if hasattr(st, "dialog"):
                         img = Image.open(full_path)
                         st.image(img, use_container_width=True)
                         st.markdown(
-                            f"<div style='text-align: center; margin-top: 3px;'><span style='font-size: 0.78rem; font-weight: 700; color: #F1F5F9 !important;'>{short_name}</span></div>",
+                            f"<div style='text-align: center; margin-top: 3px;'><span style='font-size: 0.78rem; font-weight: 700; color: #0F172A !important;'>{short_name}</span></div>",
                             unsafe_allow_html=True
                         )
                     
@@ -293,22 +293,21 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom Styling: Medcare Clinical Theme (Optimized for 100% zoom with high-density compact sizing)
+# Custom Styling: Modern Luminous Theme (ClassiAds Inspired, Responsive at 100% Zoom)
 st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         
-        /* 1. Global Canvas & Ambient Diagnostic Grid Background */
+        /* 1. Global Canvas: Luminous Porcelain with Ambient Diffuse Color Blooms (No Dot Matrix) */
         html, body, [class*="css"], .stApp {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
-            background-color: #F8FAFC !important;
+            background-color: #F8FAFD !important;
             background-image: 
-                radial-gradient(at 0% 0%, rgba(219, 234, 254, 0.65) 0px, transparent 55%),
-                radial-gradient(at 100% 0%, rgba(224, 242, 254, 0.55) 0px, transparent 50%),
-                radial-gradient(at 50% 100%, rgba(238, 242, 255, 0.55) 0px, transparent 60%),
-                radial-gradient(#CBD5E1 0.85px, transparent 0.85px) !important;
-            background-size: 100% 100%, 100% 100%, 100% 100%, 24px 24px !important;
-            background-position: 0 0, 0 0, 0 0, 0 0 !important;
+                radial-gradient(at 0% 0%, rgba(219, 234, 254, 0.75) 0px, transparent 55%),
+                radial-gradient(at 100% 0%, rgba(224, 231, 255, 0.65) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(238, 242, 255, 0.65) 0px, transparent 60%),
+                radial-gradient(at 20% 80%, rgba(224, 242, 254, 0.45) 0px, transparent 50%) !important;
+            background-size: 100% 100% !important;
             background-attachment: fixed !important;
             color: #1E293B !important;
         }
@@ -324,80 +323,75 @@ st.markdown("""
             margin: 0 auto !important;
         }
         
-        /* 3. Header & Sidebar Controls (Ensuring Closing & Re-opening Options) */
+        /* 3. Header & Sidebar Controls (Ensuring Reliable Collapse & Re-opening) */
         header[data-testid="stHeader"] {
-            height: 2.75rem !important;
+            height: 3rem !important;
             background: transparent !important;
             background-color: transparent !important;
-            pointer-events: none !important;
-            z-index: 99 !important;
+            pointer-events: auto !important;
+            z-index: 100 !important;
         }
         
-        /* Sidebar Open/Expand button when sidebar is closed */
-        [data-testid="collapsedControl"],
-        [data-testid="stSidebarCollapsedControl"],
-        button[data-testid="stSidebarCollapsedControl"] {
-            visibility: visible !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            opacity: 1 !important;
+        /* Sidebar Reopen Button when Sidebar is Closed */
+        [data-testid="collapsedControl"] {
+            z-index: 1000 !important;
             pointer-events: auto !important;
-            position: fixed !important;
-            top: 12px !important;
-            left: 12px !important;
-            z-index: 999999 !important;
+            visibility: visible !important;
+        }
+        [data-testid="collapsedControl"] button,
+        [data-testid="collapsedControl"] > span > button {
             background-color: #FFFFFF !important;
             border: 1.5px solid #CBD5E1 !important;
-            border-radius: 10px !important;
+            border-radius: 12px !important;
+            color: #2563EB !important;
             padding: 6px 10px !important;
-            box-shadow: 0 4px 12px rgba(43, 89, 237, 0.12) !important;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.15) !important;
             cursor: pointer !important;
+            transition: all 0.2s ease !important;
         }
-        [data-testid="collapsedControl"] svg,
-        [data-testid="stSidebarCollapsedControl"] svg {
-            fill: #2B59ED !important;
-            color: #2B59ED !important;
+        [data-testid="collapsedControl"] button:hover {
+            border-color: #2563EB !important;
+            background-color: #EFF6FF !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.25) !important;
+        }
+        [data-testid="collapsedControl"] svg {
+            fill: #2563EB !important;
+            stroke: #2563EB !important;
+            color: #2563EB !important;
             width: 18px !important;
             height: 18px !important;
         }
         
-        /* Sidebar Collapse/Close Button (Closing option inside sidebar) */
+        /* Sidebar Close/Collapse Button inside Sidebar */
         [data-testid="stSidebarCollapseButton"],
         div[data-testid="stSidebarHeader"] button,
-        [data-testid="stSidebarCollapseButton"] button,
         button[data-testid="baseButton-headerNoPadding"] {
-            visibility: visible !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            opacity: 1 !important;
-            background-color: #F1F5F9 !important;
+            background-color: #F8FAFC !important;
             border: 1px solid #CBD5E1 !important;
             border-radius: 10px !important;
-            color: #1E293B !important;
-            padding: 5px 8px !important;
+            color: #475569 !important;
+            padding: 6px 8px !important;
             cursor: pointer !important;
             transition: all 0.2s ease !important;
         }
         [data-testid="stSidebarCollapseButton"]:hover,
         div[data-testid="stSidebarHeader"] button:hover {
-            background-color: #E2E8F0 !important;
-            border-color: #94A3B8 !important;
+            background-color: #EFF6FF !important;
+            border-color: #2563EB !important;
+            color: #2563EB !important;
         }
         [data-testid="stSidebarCollapseButton"] svg,
         div[data-testid="stSidebarHeader"] svg,
         button[data-testid="baseButton-headerNoPadding"] svg {
-            fill: #1E293B !important;
-            stroke: #1E293B !important;
-            color: #1E293B !important;
-            visibility: visible !important;
-            opacity: 1 !important;
+            fill: currentColor !important;
+            stroke: currentColor !important;
+            color: inherit !important;
             width: 18px !important;
             height: 18px !important;
         }
         
-        /* Sidebar Resizer Handle (Draggable to extend sidebar to the right) */
+        /* Sidebar Resizer Handle (Allows dragging to extend sidebar width) */
         [data-testid="stSidebarResizer"] {
             visibility: visible !important;
             display: block !important;
@@ -407,7 +401,7 @@ st.markdown("""
             transition: background 0.2s ease !important;
         }
         [data-testid="stSidebarResizer"]:hover {
-            background: rgba(43, 89, 237, 0.25) !important;
+            background: rgba(37, 99, 235, 0.25) !important;
         }
 
         /* Hide unwanted default Streamlit badges & toolbar clutter */
@@ -435,13 +429,13 @@ st.markdown("""
             pointer-events: none !important;
         }
         
-        /* 4. Typography Hierarchy & Contrast (Deep Clinical Navy & Refined Slate) */
+        /* 4. Typography Hierarchy & Contrast (Deep Slate & Crisp Titles) */
         h1, [data-testid="stHeadingWithActionElements"] h1 {
             font-size: 1.30rem !important;
             font-weight: 800 !important;
             line-height: 1.25 !important;
             margin: 0.2rem 0 0.35rem 0 !important;
-            color: #0F2756 !important;
+            color: #0F172A !important;
             letter-spacing: -0.02em !important;
         }
         h2, [data-testid="stHeadingWithActionElements"] h2 {
@@ -449,14 +443,14 @@ st.markdown("""
             font-weight: 800 !important;
             line-height: 1.25 !important;
             margin: 0.2rem 0 0.30rem 0 !important;
-            color: #0F2756 !important;
+            color: #0F172A !important;
         }
         h3, [data-testid="stHeadingWithActionElements"] h3 {
             font-size: 0.95rem !important;
             font-weight: 700 !important;
             line-height: 1.3 !important;
             margin: 0.15rem 0 0.25rem 0 !important;
-            color: #0F2756 !important;
+            color: #0F172A !important;
         }
         h4, [data-testid="stHeadingWithActionElements"] h4 {
             font-size: 0.88rem !important;
@@ -476,11 +470,11 @@ st.markdown("""
         
         /* 5. Sidebar: Flexible Resizing & Smooth Scrolling */
         section[data-testid="stSidebar"] {
-            min-width: 270px !important;
-            max-width: 520px !important;
+            min-width: 280px !important;
+            max-width: 600px !important;
             background-color: #FFFFFF !important;
             border-right: 1px solid #E2E8F0 !important;
-            box-shadow: 4px 0 20px rgba(15, 23, 42, 0.04) !important;
+            box-shadow: 4px 0 24px rgba(15, 23, 42, 0.04) !important;
             overflow-y: auto !important;
             overflow-x: hidden !important;
         }
@@ -528,22 +522,29 @@ st.markdown("""
             width: 100% !important;
         }
         
-        /* Medcare Sidebar Brand Badge */
+        /* Modern Sidebar Brand Badge (Antigravity Style with Crisp Pure White Text) */
         .medcare-sidebar-brand {
             display: flex;
             align-items: center;
             gap: 12px;
-            background: linear-gradient(135deg, #1E3A8A 0%, #2B59ED 100%);
+            background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
             padding: 12px 14px;
-            border-radius: 14px;
+            border-radius: 16px;
             color: #FFFFFF !important;
             margin-bottom: 22px;
             width: 100%;
             box-sizing: border-box;
-            box-shadow: 0 4px 14px rgba(43, 89, 237, 0.22);
+            box-shadow: 0 4px 16px rgba(37, 99, 235, 0.25);
+        }
+        .medcare-sidebar-brand,
+        .medcare-sidebar-brand *,
+        .medcare-sidebar-brand h2,
+        .medcare-sidebar-brand div,
+        .medcare-sidebar-brand span,
+        .medcare-sidebar-brand p {
+            color: #FFFFFF !important;
         }
         .medcare-sidebar-brand h2 {
-            color: #FFFFFF !important;
             margin: 0 !important;
             font-size: 1.05rem !important;
             font-weight: 800 !important;
@@ -551,18 +552,25 @@ st.markdown("""
             line-height: 1.1;
         }
         
-        /* 6. Medcare Cards & Containers (Smooth Rounded Edges) */
-        .medcare-card {
-            background: #FFFFFF;
-            border-radius: 14px;
-            border: 1px solid #E2E8F0;
+        /* 6. ClassiAds Inspired Cards: Squircles & Ambient Elevation */
+        .medcare-card,
+        .medcare-kpi-card,
+        .biomarker-card,
+        .diagnosis-card-dr,
+        .diagnosis-card-normal,
+        .medcare-study-header {
+            background: #FFFFFF !important;
+            border-radius: 18px !important;
+            border: 1px solid #E8EEF5 !important;
             padding: 14px 16px;
-            box-shadow: 0 3px 12px rgba(43, 89, 237, 0.05);
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02) !important;
             margin-bottom: 12px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease !important;
         }
-        .medcare-card:hover {
-            box-shadow: 0 6px 18px rgba(43, 89, 237, 0.09);
+        .medcare-card:hover,
+        .medcare-kpi-card:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.08), 0 2px 6px rgba(15, 23, 42, 0.03) !important;
         }
         .medcare-card * {
             color: #1E293B !important;
@@ -571,11 +579,19 @@ st.markdown("""
             color: #334155 !important;
         }
         
-        /* 7. Buttons: Royal Blue Pill */
+        /* 7. Buttons: Royal Blue Rounded Pills with Guaranteed Pure White Text */
+        [data-testid="stButton"] button,
+        [data-testid="stButton"] button *,
+        .stButton > button,
+        .stButton > button *,
+        div.stButton > button *,
+        button[key="btn_open_contact"],
+        button[key="btn_open_contact"] * {
+            color: #FFFFFF !important;
+        }
         [data-testid="stButton"] button,
         .stButton > button {
-            background: linear-gradient(135deg, #2B59ED 0%, #3B71F7 100%) !important;
-            color: #FFFFFF !important;
+            background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
             border: none !important;
             border-radius: 12px !important;
             min-height: 34px !important;
@@ -584,12 +600,12 @@ st.markdown("""
             font-weight: 700 !important;
             font-size: 13px !important;
             letter-spacing: -0.01em !important;
-            box-shadow: 0 3px 10px rgba(43, 89, 237, 0.2) !important;
+            box-shadow: 0 3px 10px rgba(37, 99, 235, 0.2) !important;
             transition: all 0.2s ease-in-out !important;
         }
         .stButton > button:hover {
             transform: translateY(-1px) !important;
-            box-shadow: 0 5px 14px rgba(43, 89, 237, 0.3) !important;
+            box-shadow: 0 5px 14px rgba(37, 99, 235, 0.3) !important;
             color: #FFFFFF !important;
         }
         
@@ -600,6 +616,9 @@ st.markdown("""
             border: 1.5px solid #A7F3D0 !important;
             border-radius: 12px !important;
             box-shadow: 0 2px 6px rgba(16, 185, 129, 0.08) !important;
+        }
+        button[key="btn_side_norm"] *, button[key="btn_w_norm"] * {
+            color: #065F46 !important;
         }
         button[key="btn_side_norm"]:hover, button[key="btn_w_norm"]:hover {
             background: #DCFCE7 !important;
@@ -613,13 +632,16 @@ st.markdown("""
             border-radius: 12px !important;
             box-shadow: 0 2px 6px rgba(239, 68, 68, 0.08) !important;
         }
+        button[key="btn_side_dr"] *, button[key="btn_w_dr"] * {
+            color: #991B1B !important;
+        }
         button[key="btn_side_dr"]:hover, button[key="btn_w_dr"]:hover {
             background: #FEE2E2 !important;
             border-color: #F87171 !important;
             color: #B91C1C !important;
         }
         
-        /* 8. Tabs: Modern Rounded Pill Tabs (No Sharp Red Underline) */
+        /* 8. Tabs: Modern Rounded Pill Tabs (ClassiAds Segmented Style) */
         div[data-testid="stTabs"] div[role="tablist"],
         div[data-testid="stTabs"] [data-baseweb="tab-list"],
         .stTabs [data-baseweb="tab-list"] {
@@ -649,7 +671,7 @@ st.markdown("""
         div[data-testid="stTabs"] button[data-testid="stTab"]:hover,
         div[data-testid="stTabs"] button[role="tab"]:hover,
         div[data-testid="stTabs"] [data-baseweb="tab"]:hover {
-            color: #2B59ED !important;
+            color: #2563EB !important;
             background-color: #F8FAFC !important;
         }
         div[data-testid="stTabs"] button[data-testid="stTab"][aria-selected="true"],
@@ -657,10 +679,10 @@ st.markdown("""
         div[data-testid="stTabs"] [aria-selected="true"],
         .stTabs [aria-selected="true"] {
             background-color: #FFFFFF !important;
-            color: #2B59ED !important;
+            color: #2563EB !important;
             border: 1.5px solid #C7D2FE !important;
             border-radius: 10px !important;
-            box-shadow: 0 2px 8px rgba(43, 89, 237, 0.12) !important;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12) !important;
         }
         /* Completely eliminate sharp rectangular red underline */
         div[data-testid="stTabs"] [data-baseweb="tab-highlight"],
@@ -675,26 +697,31 @@ st.markdown("""
             opacity: 0 !important;
         }
         
-        /* 9. Radio Buttons as Segmented Control (Smooth Rounded Edges) */
+        /* 9. Segmented Control for Radio Buttons (Hide raw dots) */
+        div[data-testid="stRadio"] input[type="radio"] {
+            display: none !important;
+        }
         div[data-testid="stRadio"] > div {
-            background-color: #EEF2F6;
-            padding: 4px;
-            border-radius: 12px;
-            gap: 4px;
-            border: 1px solid #E2E8F0;
+            background-color: #EEF2F6 !important;
+            padding: 4px !important;
+            border-radius: 14px !important;
+            gap: 4px !important;
+            border: 1px solid #E2E8F0 !important;
         }
         div[data-testid="stRadio"] label {
-            padding: 5px 12px;
-            border-radius: 9px;
-            font-weight: 700;
-            font-size: 12.5px;
+            padding: 6px 14px !important;
+            border-radius: 10px !important;
+            font-weight: 700 !important;
+            font-size: 12.5px !important;
             color: #475569 !important;
-            transition: all 0.15s ease;
+            cursor: pointer !important;
+            transition: all 0.15s ease !important;
         }
-        div[data-testid="stRadio"] label[data-checked="true"] {
-            background-color: #FFFFFF;
-            color: #2B59ED !important;
-            box-shadow: 0 2px 6px rgba(43, 89, 237, 0.1);
+        div[data-testid="stRadio"] label[data-checked="true"],
+        div[data-testid="stRadio"] label:has(input:checked) {
+            background-color: #FFFFFF !important;
+            color: #2563EB !important;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12) !important;
         }
 
         /* 9b. Clean Light-Themed File Uploader (Zero Dark Backgrounds) */
@@ -707,16 +734,16 @@ st.markdown("""
         div[data-testid="stFileUploaderDropzone"] {
             background-color: #F8FAFC !important;
             border: 1.5px dashed #CBD5E1 !important;
-            border-radius: 12px !important;
+            border-radius: 14px !important;
             color: #1E293B !important;
-            padding: 8px 10px !important;
+            padding: 10px 12px !important;
             transition: all 0.2s ease-in-out !important;
         }
         [data-testid="stFileUploader"] section:hover,
         [data-testid="stFileUploaderDropzone"]:hover,
         section[data-testid="stFileUploadDropzone"]:hover {
-            border-color: #2B59ED !important;
-            background-color: #EEF2FF !important;
+            border-color: #2563EB !important;
+            background-color: #EFF6FF !important;
         }
         [data-testid="stFileUploader"] * {
             color: #1E293B !important;
@@ -740,12 +767,12 @@ st.markdown("""
         }
         [data-testid="stFileUploader"] button:hover {
             background-color: #F1F5F9 !important;
-            color: #2B59ED !important;
-            border-color: #2B59ED !important;
+            color: #2563EB !important;
+            border-color: #2563EB !important;
         }
         [data-testid="stFileUploader"] svg {
-            fill: #2B59ED !important;
-            stroke: #2B59ED !important;
+            fill: #2563EB !important;
+            stroke: #2563EB !important;
         }
         
         /* 10. Fundus Image Display Constraints (Compact 290px max) */
@@ -761,7 +788,7 @@ st.markdown("""
             width: auto !important;
             height: auto !important;
             object-fit: contain !important;
-            border-radius: 12px !important;
+            border-radius: 14px !important;
             border: 1px solid #E2E8F0 !important;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
             background-color: #000000 !important;
@@ -771,21 +798,21 @@ st.markdown("""
         .badge-info {
             display: inline-flex;
             align-items: center;
-            background-color: #EEF2FF;
-            color: #2B59ED !important;
+            background-color: #EFF6FF;
+            color: #2563EB !important;
             padding: 3px 9px;
             border-radius: 9999px;
             font-size: 0.70rem;
             font-weight: 700;
             margin-right: 5px;
-            border: 1px solid #E0E7FF;
+            border: 1px solid #DBEAFE;
         }
 
         /* Social Badges with Guaranteed Visibility */
         .social-badge {
             text-decoration: none !important;
             color: #1E3A8A !important;
-            background-color: #EEF2FF !important;
+            background-color: #EFF6FF !important;
             border: 1px solid #C7D2FE !important;
             padding: 5px 11px !important;
             border-radius: 10px !important;
@@ -798,27 +825,35 @@ st.markdown("""
             transition: all 0.15s ease-in-out !important;
         }
         .social-badge:hover {
-            background-color: #E0E7FF !important;
+            background-color: #DBEAFE !important;
             color: #1D4ED8 !important;
-            border-color: #818CF8 !important;
+            border-color: #93C5FD !important;
         }
         .social-badge svg {
             fill: #1E3A8A !important;
         }
 
-        /* 11. Medcare Hero Banner & KPI Components (Compact Sizing) */
+        /* 11. Modern Hero Banner & KPI Components with Glowing White Text */
         .medcare-hero-banner {
-            background: linear-gradient(135deg, #1E3A8A 0%, #2B59ED 60%, #3B82F6 100%);
-            border-radius: 16px;
+            background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 60%, #38BDF8 100%);
+            border-radius: 18px;
             padding: 16px 22px;
             color: #FFFFFF !important;
-            box-shadow: 0 6px 20px rgba(43, 89, 237, 0.16);
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.2);
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 14px;
             position: relative;
             overflow: hidden;
+        }
+        .medcare-hero-banner,
+        .medcare-hero-banner *,
+        .medcare-hero-banner h2,
+        .medcare-hero-banner div,
+        .medcare-hero-banner span,
+        .medcare-hero-banner p {
+            color: #FFFFFF !important;
         }
         .medcare-hero-banner::after {
             content: "";
@@ -828,33 +863,28 @@ st.markdown("""
             width: 170px;
             height: 170px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
             pointer-events: none;
         }
         .medcare-hero-banner h2 {
-            color: #FFFFFF !important;
             font-size: 1.25rem !important;
             font-weight: 800 !important;
             margin: 2px 0 4px 0 !important;
             letter-spacing: -0.02em !important;
         }
         .medcare-hero-banner p {
-            color: rgba(255, 255, 255, 0.94) !important;
             font-size: 0.80rem !important;
             line-height: 1.45 !important;
             margin: 0 !important;
             max-width: 680px !important;
-        }
-        .medcare-hero-banner div,
-        .medcare-hero-banner span {
-            color: #FFFFFF !important;
+            opacity: 0.95;
         }
         .medcare-badge-live {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: rgba(255, 255, 255, 0.18);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.35);
             color: #FFFFFF !important;
             font-size: 0.68rem;
             font-weight: 700;
@@ -870,19 +900,10 @@ st.markdown("""
             margin-bottom: 14px;
         }
         .medcare-kpi-card {
-            background: #FFFFFF;
-            border-radius: 14px;
-            padding: 10px 14px;
-            border: 1px solid #E9EFF7;
-            box-shadow: 0 2px 8px rgba(43, 89, 237, 0.04);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .medcare-kpi-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 14px rgba(43, 89, 237, 0.08);
+            padding: 12px 14px !important;
         }
         .kpi-title {
             font-size: 0.64rem;
@@ -895,7 +916,7 @@ st.markdown("""
         .kpi-val {
             font-size: 1.20rem;
             font-weight: 800;
-            color: #0F2756 !important;
+            color: #0F172A !important;
             line-height: 1.1;
             margin-bottom: 4px;
         }
@@ -917,25 +938,20 @@ st.markdown("""
             gap: 3px;
             font-size: 0.66rem;
             font-weight: 700;
-            color: #2B59ED !important;
-            background: #EEF2FF;
+            color: #2563EB !important;
+            background: #EFF6FF;
             padding: 2px 6px;
             border-radius: 8px;
             width: fit-content;
         }
         
-        /* 12. Medcare Patient Study Header & Diagnosis Cards */
+        /* 12. Patient Study Header & Diagnosis Cards */
         .medcare-study-header {
-            background: #FFFFFF;
-            border-radius: 14px;
-            padding: 12px 18px;
-            border: 1px solid #E2E8F0;
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
             align-items: center;
             margin-bottom: 14px;
-            box-shadow: 0 2px 8px rgba(43, 89, 237, 0.04);
         }
         .study-meta-item {
             display: flex;
@@ -952,28 +968,20 @@ st.markdown("""
         .meta-val {
             font-size: 0.84rem;
             font-weight: 700;
-            color: #0F2756 !important;
+            color: #0F172A !important;
         }
         
         .diagnosis-card-dr {
-            background: #FFFFFF;
-            border-radius: 14px;
-            border: 1px solid #FEE2E2;
-            border-left: 5px solid #EF4444;
-            padding: 14px 18px;
-            box-shadow: 0 3px 12px rgba(239, 68, 68, 0.08);
+            border: 1px solid #FEE2E2 !important;
+            border-left: 5px solid #EF4444 !important;
             display: flex;
             align-items: flex-start;
             gap: 14px;
             min-height: 115px;
         }
         .diagnosis-card-normal {
-            background: #FFFFFF;
-            border-radius: 14px;
-            border: 1px solid #D1FAE5;
-            border-left: 5px solid #10B981;
-            padding: 14px 18px;
-            box-shadow: 0 3px 12px rgba(16, 185, 129, 0.08);
+            border: 1px solid #D1FAE5 !important;
+            border-left: 5px solid #10B981 !important;
             display: flex;
             align-items: flex-start;
             gap: 14px;
@@ -982,11 +990,6 @@ st.markdown("""
         
         /* Biomarker Severity Matrix Card */
         .biomarker-card {
-            background: #FFFFFF;
-            border-radius: 14px;
-            border: 1px solid #E2E8F0;
-            padding: 12px 16px;
-            box-shadow: 0 2px 8px rgba(43, 89, 237, 0.04);
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -1025,13 +1028,14 @@ full_model, feature_extractor, scaler, svm, load_error = load_models()
 with st.sidebar:
     st.markdown("""
     <div class="medcare-sidebar-brand">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-            <circle cx="12" cy="12" r="3"/>
+        <!-- Modern Standard AI 4-Point Radiant Diamond Spark Emblem (Antigravity Trend) -->
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L14.85 9.15L22 12L14.85 14.85L12 22L9.15 14.85L2 12L9.15 9.15L12 2Z" fill="#FFFFFF"/>
+            <path d="M19 4L20.2 6.8L23 8L20.2 9.2L19 12L17.8 9.2L15 8L17.8 6.8L19 4Z" fill="rgba(255,255,255,0.7)"/>
         </svg>
         <div>
-            <h2>RetinaAI Care</h2>
-            <div style="font-size: 0.64rem; opacity: 0.9; font-weight: 600; letter-spacing: 0.04em;">CLINICAL DECISION SYSTEM</div>
+            <h2 style="color: #FFFFFF !important; margin: 0 !important; font-size: 1.05rem !important; font-weight: 800 !important; letter-spacing: -0.02em; line-height: 1.1;">RetinaAI Care</h2>
+            <div style="color: rgba(255, 255, 255, 0.88) !important; font-size: 0.64rem !important; font-weight: 600 !important; letter-spacing: 0.05em;">CLINICAL DECISION SYSTEM</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -1195,11 +1199,10 @@ if active_image is None:
                 Welcome to <b>RetinaAI Care</b> workstation. Automated ophthalmic fundus screening powered by hybrid EfficientNetV2-S deep feature extraction, Support Vector Machines, and Explainable AI (Grad-CAM & LIME).
             </p>
         </div>
-        <div style="margin-left: 18px; opacity: 0.92; z-index: 1;">
-            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-                <circle cx="12" cy="12" r="3"/>
-                <circle cx="12" cy="12" r="1" fill="#FFFFFF"/>
+        <div style="margin-left: 18px; opacity: 0.95; z-index: 1;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L14.85 9.15L22 12L14.85 14.85L12 22L9.15 14.85L2 12L9.15 9.15L12 2Z" fill="#FFFFFF"/>
+                <path d="M19 4L20.2 6.8L23 8L20.2 9.2L19 12L17.8 9.2L15 8L17.8 6.8L19 4Z" fill="rgba(255,255,255,0.7)"/>
             </svg>
         </div>
     </div>
