@@ -288,7 +288,7 @@ else:
 
 #---------------Streamlit UI Page Settings---------------------------------------------
 st.set_page_config(
-    page_title="RetinaAI Care | Clinical Diagnostic Workstation",
+    page_title="RetinaAI Care | AI Diagnostic System",
     layout="wide",
     initial_sidebar_state="auto"
 )
@@ -323,68 +323,61 @@ st.markdown("""
             margin: 0 auto !important;
         }
         
-        /* 3. Header & Sidebar Controls (Ensuring Reliable Collapse & Re-opening with Antigravity Icon) */
+        /* 3. Header & Sidebar Controls (Ensuring Reliable Collapse & Re-opening with Reference Icon) */
         header[data-testid="stHeader"] {
             height: 3.5rem !important;
             background: transparent !important;
             background-color: transparent !important;
-            pointer-events: none !important;
-            z-index: 9999 !important;
-        }
-        header[data-testid="stHeader"] * {
             pointer-events: auto !important;
+            z-index: 100 !important;
         }
         
-        /* Sidebar Reopen Button: Fixed at top-left when collapsed */
+        /* Sidebar Reopen Button: Mounted by Streamlit exclusively when sidebar is collapsed */
         [data-testid="collapsedControl"] {
             position: fixed !important;
             top: 14px !important;
             left: 14px !important;
             z-index: 999999 !important;
-            pointer-events: auto !important;
-        }
-        
-        /* Show reopen button when sidebar is collapsed */
-        div[data-testid="stAppViewContainer"]:has(section[data-testid="stSidebar"][aria-expanded="false"]) [data-testid="collapsedControl"],
-        section[data-testid="stSidebar"][aria-expanded="false"] ~ header [data-testid="collapsedControl"],
-        section[data-testid="stSidebar"][aria-expanded="false"] ~ * [data-testid="collapsedControl"] {
-            display: flex !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-        
-        /* Hide reopen button when sidebar is expanded */
-        div[data-testid="stAppViewContainer"]:has(section[data-testid="stSidebar"][aria-expanded="true"]) [data-testid="collapsedControl"],
-        section[data-testid="stSidebar"][aria-expanded="true"] ~ header [data-testid="collapsedControl"],
-        section[data-testid="stSidebar"][aria-expanded="true"] ~ * [data-testid="collapsedControl"] {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-        }
-
-        [data-testid="collapsedControl"] button,
-        [data-testid="collapsedControl"] > span > button,
-        [data-testid="stSidebarCollapsedControl"] {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            width: 38px !important;
-            height: 38px !important;
-            min-width: 38px !important;
-            min-height: 38px !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+
+        /* Unified Button Styling matching user reference image */
+        [data-testid="collapsedControl"] button,
+        [data-testid="stSidebarCollapsedControl"],
+        [data-testid="stSidebarCollapseButton"],
+        div[data-testid="stSidebarHeader"] button,
+        button[data-testid="baseButton-headerNoPadding"] {
+            position: relative !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 36px !important;
+            height: 36px !important;
+            min-width: 36px !important;
+            min-height: 36px !important;
+            max-width: 36px !important;
+            max-height: 36px !important;
             background-color: #FFFFFF !important;
             border: 1.5px solid #CBD5E1 !important;
             border-radius: 10px !important;
             color: #1E293B !important;
             padding: 0 !important;
-            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12) !important;
+            margin: 0 !important;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08) !important;
             cursor: pointer !important;
             pointer-events: auto !important;
             transition: all 0.2s ease !important;
         }
         [data-testid="collapsedControl"] button:hover,
-        [data-testid="stSidebarCollapsedControl"]:hover {
+        [data-testid="stSidebarCollapsedControl"]:hover,
+        [data-testid="stSidebarCollapseButton"]:hover,
+        div[data-testid="stSidebarHeader"] button:hover,
+        button[data-testid="baseButton-headerNoPadding"]:hover {
             border-color: #2563EB !important;
             background-color: #EFF6FF !important;
             color: #2563EB !important;
@@ -392,57 +385,49 @@ st.markdown("""
             box-shadow: 0 6px 20px rgba(37, 99, 235, 0.22) !important;
         }
 
-        /* Sidebar Close/Collapse Button inside Sidebar */
-        [data-testid="stSidebarCollapseButton"],
-        div[data-testid="stSidebarHeader"] button {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            width: 34px !important;
-            height: 34px !important;
-            min-width: 34px !important;
-            min-height: 34px !important;
-            background-color: #F8FAFC !important;
-            border: 1px solid #CBD5E1 !important;
-            border-radius: 9px !important;
-            color: #475569 !important;
-            padding: 0 !important;
-            cursor: pointer !important;
-            pointer-events: auto !important;
-            transition: all 0.2s ease !important;
-        }
-        [data-testid="stSidebarCollapseButton"]:hover,
-        div[data-testid="stSidebarHeader"] button:hover {
-            background-color: #EFF6FF !important;
-            border-color: #2563EB !important;
-            color: #2563EB !important;
-        }
-
-        /* Hide default Streamlit chevron SVGs in both buttons */
-        [data-testid="collapsedControl"] svg,
-        [data-testid="stSidebarCollapsedControl"] svg,
-        [data-testid="stSidebarCollapseButton"] svg,
-        div[data-testid="stSidebarHeader"] button svg {
+        /* Completely suppress all native Streamlit text/SVGs inside toggle buttons */
+        [data-testid="collapsedControl"] button *,
+        [data-testid="stSidebarCollapsedControl"] *,
+        [data-testid="stSidebarCollapseButton"] *,
+        div[data-testid="stSidebarHeader"] button *,
+        button[data-testid="baseButton-headerNoPadding"] * {
             display: none !important;
             visibility: hidden !important;
             opacity: 0 !important;
             width: 0 !important;
             height: 0 !important;
+            pointer-events: none !important;
         }
 
-        /* Inject Antigravity standard sidebar toggle icon [| ] */
-        [data-testid="collapsedControl"] button::before,
-        [data-testid="stSidebarCollapsedControl"]::before,
-        [data-testid="stSidebarCollapseButton"]::before,
-        div[data-testid="stSidebarHeader"] button::before {
+        /* Close / Collapse button inside sidebar: Reference squircle with chevron pointing LEFT < */
+        [data-testid="stSidebarCollapseButton"]::after,
+        div[data-testid="stSidebarHeader"] button::after,
+        button[data-testid="baseButton-headerNoPadding"]::after {
             content: "" !important;
             display: block !important;
-            width: 19px !important;
-            height: 19px !important;
+            width: 22px !important;
+            height: 22px !important;
+            flex-shrink: 0 !important;
+            margin: auto !important;
             background-color: currentColor !important;
-            -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='18' height='18' x='3' y='3' rx='3'/%3E%3Cpath d='M9 3v18'/%3E%3C/svg%3E") no-repeat center / contain !important;
-            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='18' height='18' x='3' y='3' rx='3'/%3E%3Cpath d='M9 3v18'/%3E%3C/svg%3E") no-repeat center / contain !important;
-            transition: all 0.2s ease !important;
+            -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='2.5' width='19' height='19' rx='5'/%3E%3Cline x1='8.5' y1='2.5' x2='8.5' y2='21.5'/%3E%3Cpolyline points='16.5 8.5 12.5 12 16.5 15.5'/%3E%3C/svg%3E") no-repeat center / contain !important;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='2.5' width='19' height='19' rx='5'/%3E%3Cline x1='8.5' y1='2.5' x2='8.5' y2='21.5'/%3E%3Cpolyline points='16.5 8.5 12.5 12 16.5 15.5'/%3E%3C/svg%3E") no-repeat center / contain !important;
+            pointer-events: none !important;
+        }
+
+        /* Open / Reopen button when sidebar is collapsed: Reference squircle with chevron pointing RIGHT > */
+        [data-testid="collapsedControl"] button::after,
+        [data-testid="stSidebarCollapsedControl"]::after {
+            content: "" !important;
+            display: block !important;
+            width: 22px !important;
+            height: 22px !important;
+            flex-shrink: 0 !important;
+            margin: auto !important;
+            background-color: currentColor !important;
+            -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='2.5' width='19' height='19' rx='5'/%3E%3Cline x1='8.5' y1='2.5' x2='8.5' y2='21.5'/%3E%3Cpolyline points='12.5 8.5 16.5 12 12.5 15.5'/%3E%3C/svg%3E") no-repeat center / contain !important;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='2.5' width='19' height='19' rx='5'/%3E%3Cline x1='8.5' y1='2.5' x2='8.5' y2='21.5'/%3E%3Cpolyline points='12.5 8.5 16.5 12 12.5 15.5'/%3E%3C/svg%3E") no-repeat center / contain !important;
+            pointer-events: none !important;
         }
         
         /* Sidebar Resizer Handle (Allows dragging to extend sidebar width) */
@@ -528,25 +513,13 @@ st.markdown("""
             line-height: 1.35 !important;
         }
         
-        /* 5. Sidebar: Flexible Resizing & Smooth Scrolling */
-        section[data-testid="stSidebar"][aria-expanded="true"] {
-            min-width: 280px !important;
-            max-width: 600px !important;
+        /* 5. Sidebar: Clean Styling & Native Smooth Resizing */
+        section[data-testid="stSidebar"] {
             background-color: #FFFFFF !important;
             border-right: 1px solid #E2E8F0 !important;
             box-shadow: 4px 0 24px rgba(15, 23, 42, 0.04) !important;
             overflow-y: auto !important;
             overflow-x: hidden !important;
-            display: block !important;
-            pointer-events: auto !important;
-        }
-        section[data-testid="stSidebar"][aria-expanded="false"] {
-            min-width: 0px !important;
-            width: 0px !important;
-            margin-left: -600px !important;
-            transform: translateX(-100%) !important;
-            display: none !important;
-            pointer-events: none !important;
         }
         div[data-testid="stSidebarUserContent"] {
             width: 100% !important;
@@ -1266,7 +1239,7 @@ if active_image is None:
             </div>
             <div style="font-size: 1.25rem; font-weight: 800; color: #FFFFFF !important; margin: 2px 0 4px 0; letter-spacing: -0.02em; line-height: 1.2;">Good Day, Clinician</div>
             <p style="color: rgba(255, 255, 255, 0.94) !important; font-size: 0.82rem; line-height: 1.45; margin: 0; max-width: 680px;">
-                Welcome to <b>RetinaAI Care</b> workstation. Automated ophthalmic fundus screening powered by hybrid EfficientNetV2-S deep feature extraction, Support Vector Machines, and Explainable AI (Grad-CAM & LIME).
+                Welcome to <b>RetinaAI Care</b>. Automated ophthalmic fundus screening powered by hybrid EfficientNetV2-S deep feature extraction, Support Vector Machines, and Explainable AI (Grad-CAM & LIME).
             </p>
         </div>
         <div style="margin-left: 18px; opacity: 0.95; z-index: 1;">
