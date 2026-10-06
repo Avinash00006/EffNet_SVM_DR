@@ -29,3 +29,8 @@ Desktop.ini
 .idea/
 *.swp
 *.swo
+
+# Local Development Documentation (Keep Private)
+DEVELOPMENT_BLUEPRINT.md
+*BLUEPRINT*.md
+

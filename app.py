@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import torch
 import numpy as np
@@ -10,6 +11,21 @@ from skimage.segmentation import mark_boundaries
 from src.preprocessing import preprocess_fundus_image, transform, validate_fundus_image
 from src.model_inference import load_models, ExplanationEngine
 from src.contact import send_contact_message
+
+# Preloaded sample cases dictionary (Available for cloud demo users)
+SAMPLE_CASES = {
+    "Select a preloaded sample...": None,
+    "Normal Retina - Case 1 (002c21358ce6)": "sample_images/Normal Eyes/002c21358ce6.png",
+    "Normal Retina - Case 2 (005b95c28852)": "sample_images/Normal Eyes/005b95c28852.png",
+    "Normal Retina - Case 3 (0097f532ac9f)": "sample_images/Normal Eyes/0097f532ac9f.png",
+    "Normal Retina - Case 4 (00cc2b75cddd)": "sample_images/Normal Eyes/00cc2b75cddd.png",
+    "Normal Retina - Case 5 (00f6c1be5a33)": "sample_images/Normal Eyes/00f6c1be5a33.png",
+    "Diabetic Retinopathy - Case 1 (000c1434d8d7)": "sample_images/Diabetic Retinopathy/000c1434d8d7.png",
+    "Diabetic Retinopathy - Case 2 (001639a390f0)": "sample_images/Diabetic Retinopathy/001639a390f0.png",
+    "Diabetic Retinopathy - Case 3 (0024cdab0c1e)": "sample_images/Diabetic Retinopathy/0024cdab0c1e.png",
+    "Diabetic Retinopathy - Case 4 (0083ee8054ee)": "sample_images/Diabetic Retinopathy/0083ee8054ee.png",
+    "Diabetic Retinopathy - Case 5 (00a8624548a9)": "sample_images/Diabetic Retinopathy/00a8624548a9.png",
+}
 
 #---------------Streamlit UI Page Settings---------------------------------------------
 st.set_page_config(
@@ -102,26 +118,64 @@ with st.sidebar:
     st.markdown("<span style='font-size: 0.8rem; color:#64748B; font-weight:600;'>PACS DECISION SUPPORT SYSTEM</span>", unsafe_allow_html=True)
     st.markdown("---")
     
-    st.subheader("📁 Fundus Photography Upload")
-    uploaded_file = st.file_uploader(
-        "Upload a retinal fundus image (.jpg, .jpeg, .png)",
-        type=["jpg", "png", "jpeg"],
+    st.subheader("📁 Fundus Photography Input")
+    input_mode = st.radio(
+        "Choose Input Source",
+        ["📤 Upload Image", "🖼️ Preloaded Sample Cases"],
+        horizontal=True,
         label_visibility="collapsed"
     )
     
-    # State placeholders
+    active_image = None
+    active_source_label = None
     is_already_preprocessed = False
     validation_error = None
     
+    if input_mode == "📤 Upload Image":
+        uploaded_file = st.file_uploader(
+            "Upload a retinal fundus image (.jpg, .jpeg, .png)",
+            type=["jpg", "png", "jpeg"],
+            label_visibility="collapsed"
+        )
+        if uploaded_file is not None:
+            try:
+                active_image = Image.open(uploaded_file).convert("RGB")
+                active_source_label = f"Uploaded File ({uploaded_file.name})"
+            except Exception as e:
+                validation_error = f"Failed to parse image file: {str(e)}"
+    else:
+        st.markdown("<span style='font-size:0.8rem; color:#64748B;'>Select a curated case to test without uploading:</span>", unsafe_allow_html=True)
+        sample_choice = st.selectbox(
+            "Select a preloaded case",
+            list(SAMPLE_CASES.keys()),
+            label_visibility="collapsed"
+        )
+        if sample_choice != "Select a preloaded sample...":
+            sample_rel_path = SAMPLE_CASES[sample_choice]
+            sample_path = os.path.join(os.path.dirname(__file__), sample_rel_path)
+            if os.path.exists(sample_path):
+                try:
+                    active_image = Image.open(sample_path).convert("RGB")
+                    active_source_label = sample_choice
+                    
+                    with open(sample_path, "rb") as f:
+                        st.download_button(
+                            label="📥 Download This Sample File",
+                            data=f.read(),
+                            file_name=os.path.basename(sample_path),
+                            mime="image/png",
+                            use_container_width=True
+                        )
+                except Exception as e:
+                    validation_error = f"Failed to load sample image: {str(e)}"
+            else:
+                validation_error = f"Sample file not found at {sample_path}"
+
     # Run validation immediately in sidebar background to update controls
-    if uploaded_file is not None:
-        try:
-            original_image = Image.open(uploaded_file).convert("RGB")
-            is_valid, validation_msg, is_already_preprocessed = validate_fundus_image(original_image)
-            if not is_valid:
-                validation_error = validation_msg
-        except Exception as e:
-            validation_error = f"Failed to parse image file: {str(e)}"
+    if active_image is not None and validation_error is None:
+        is_valid, validation_msg, is_already_preprocessed = validate_fundus_image(active_image)
+        if not is_valid:
+            validation_error = validation_msg
             
     st.markdown("---")
     st.subheader("📬 Developer & Support")
@@ -190,8 +244,8 @@ EffNet_SVM_DR/
 # Instantiate Explanation Engine
 engine = ExplanationEngine(full_model, feature_extractor, scaler, svm)
 
-# UI STATE 1: Welcome Screen (Awaiting File Upload)
-if uploaded_file is None:
+# UI STATE 1: Welcome Screen (Awaiting File Upload or Sample Selection)
+if active_image is None:
     st.title("👁️ Retinal AI Diagnostics Workstation")
     st.markdown(
         '<span class="badge-info">Clinical Decision Support Tool</span>'
@@ -239,9 +293,10 @@ if uploaded_file is None:
             )
             
     st.markdown("<br><br>", unsafe_allow_html=True)
-    st.success("👈 Upload a retinal fundus image in the sidebar panel to initialize diagnostics.")
+    st.info("💡 **Don't have a retinal photo?** Select **'🖼️ Preloaded Sample Cases'** in the sidebar to test Normal and Diabetic Retinopathy cases instantly!")
+    st.success("👈 Upload an image or choose a preloaded sample in the sidebar to initialize diagnostics.")
 
-# UI STATE 2: Medical Report Screen (Image Uploaded & Validated)
+# UI STATE 2: Medical Report Screen (Image Uploaded or Sample Selected)
 else:
     # 1. Handle validation errors immediately on main canvas
     if validation_error is not None:
@@ -253,11 +308,11 @@ else:
     
     # Structured Patient / Study Metadata Card
     st.markdown(
-        """
+        f"""
         <div style="display: flex; flex-wrap: wrap; gap: 24px; padding: 14px; border: 1px solid rgba(128,128,128,0.2); border-radius: 8px; background-color: rgba(128,128,128,0.05); margin-bottom: 20px; font-size: 0.8rem; letter-spacing: 0.02em;">
             <div><span style="color: #64748B; font-weight: 700;">STUDY TYPE:</span> <span style="font-weight: 500;">Ophthalmic Fundus Photography</span></div>
+            <div><span style="color: #64748B; font-weight: 700;">CASE SOURCE:</span> <span style="font-weight: 500;">{active_source_label}</span></div>
             <div><span style="color: #64748B; font-weight: 700;">MODEL SPECIFICATION:</span> <span style="font-weight: 500;">EfficientNetV2-S + SVM</span></div>
-            <div><span style="color: #64748B; font-weight: 700;">CRITERIA CALIBRATION:</span> <span style="font-weight: 500;">APTOS 2019 Calibration Scale</span></div>
             <div><span style="color: #64748B; font-weight: 700;">PAC WORKSTATION:</span> <span style="color: #10B981; font-weight: 700;">🟢 CONNECTED</span></div>
         </div>
         """,
@@ -265,7 +320,7 @@ else:
     )
     
     # Diagnostic Processing Pipeline
-    original_image = Image.open(uploaded_file).convert("RGB")
+    original_image = active_image
     
     with st.spinner("Processing image and executing model inference..."):
         # Preprocessing fundus image (Ben Graham)
