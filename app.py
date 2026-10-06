@@ -332,26 +332,62 @@ st.markdown("""
             z-index: 100 !important;
         }
         
-        /* Sidebar Reopen Button: Mounted by Streamlit exclusively when sidebar is collapsed */
-        [data-testid="collapsedControl"] {
+        /* Reopen Container: Placed at top-left when sidebar is collapsed */
+        div[data-testid="collapsedControl"] {
             position: fixed !important;
             top: 14px !important;
             left: 14px !important;
             z-index: 999999 !important;
-            display: flex !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
+            width: auto !important;
+            height: auto !important;
             visibility: visible !important;
             opacity: 1 !important;
             pointer-events: auto !important;
         }
+        div[data-testid="collapsedControl"]::before,
+        div[data-testid="collapsedControl"]::after {
+            content: none !important;
+            display: none !important;
+        }
 
-        /* Unified Button Styling matching user reference image */
-        [data-testid="collapsedControl"] button,
-        [data-testid="stSidebarCollapsedControl"],
-        [data-testid="stSidebarCollapseButton"],
-        div[data-testid="stSidebarHeader"] button,
-        button[data-testid="baseButton-headerNoPadding"] {
+        /* Sidebar Header and Collapse Container Neutralization */
+        div[data-testid="stSidebarHeader"] {
+            display: flex !important;
+            justify-content: flex-end !important;
+            align-items: center !important;
+            padding: 0.75rem 1rem 0.25rem 1rem !important;
+            background: transparent !important;
+        }
+        div[data-testid="stSidebarCollapseButton"] {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: auto !important;
+            height: auto !important;
+        }
+        div[data-testid="stSidebarCollapseButton"]::before,
+        div[data-testid="stSidebarCollapseButton"]::after {
+            content: none !important;
+            display: none !important;
+        }
+
+        /* Unified Button Styling: Target STRICTLY the <button> element */
+        div[data-testid="collapsedControl"] button,
+        div[data-testid="stSidebarCollapseButton"] button,
+        div[data-testid="stSidebarHeader"] button {
             position: relative !important;
             display: flex !important;
             align-items: center !important;
@@ -372,12 +408,13 @@ st.markdown("""
             cursor: pointer !important;
             pointer-events: auto !important;
             transition: all 0.2s ease !important;
+            overflow: hidden !important;
+            font-size: 0 !important;
+            line-height: 0 !important;
         }
-        [data-testid="collapsedControl"] button:hover,
-        [data-testid="stSidebarCollapsedControl"]:hover,
-        [data-testid="stSidebarCollapseButton"]:hover,
-        div[data-testid="stSidebarHeader"] button:hover,
-        button[data-testid="baseButton-headerNoPadding"]:hover {
+        div[data-testid="collapsedControl"] button:hover,
+        div[data-testid="stSidebarCollapseButton"] button:hover,
+        div[data-testid="stSidebarHeader"] button:hover {
             border-color: #2563EB !important;
             background-color: #EFF6FF !important;
             color: #2563EB !important;
@@ -385,12 +422,13 @@ st.markdown("""
             box-shadow: 0 6px 20px rgba(37, 99, 235, 0.22) !important;
         }
 
-        /* Completely suppress all native Streamlit text/SVGs inside toggle buttons */
-        [data-testid="collapsedControl"] button *,
-        [data-testid="stSidebarCollapsedControl"] *,
-        [data-testid="stSidebarCollapseButton"] *,
-        div[data-testid="stSidebarHeader"] button *,
-        button[data-testid="baseButton-headerNoPadding"] * {
+        /* Suppress ONLY native SVGs and text glyphs inside the buttons */
+        div[data-testid="collapsedControl"] button svg,
+        div[data-testid="collapsedControl"] button span,
+        div[data-testid="stSidebarCollapseButton"] button svg,
+        div[data-testid="stSidebarCollapseButton"] button span,
+        div[data-testid="stSidebarHeader"] button svg,
+        div[data-testid="stSidebarHeader"] button span {
             display: none !important;
             visibility: hidden !important;
             opacity: 0 !important;
@@ -399,16 +437,16 @@ st.markdown("""
             pointer-events: none !important;
         }
 
-        /* Close / Collapse button inside sidebar: Reference squircle with chevron pointing LEFT < */
-        [data-testid="stSidebarCollapseButton"]::after,
-        div[data-testid="stSidebarHeader"] button::after,
-        button[data-testid="baseButton-headerNoPadding"]::after {
+        /* Collapse button inside sidebar: Reference squircle with chevron pointing LEFT < */
+        div[data-testid="stSidebarCollapseButton"] button::after,
+        div[data-testid="stSidebarHeader"] button::after {
             content: "" !important;
-            display: block !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
             width: 22px !important;
             height: 22px !important;
-            flex-shrink: 0 !important;
-            margin: auto !important;
             background-color: currentColor !important;
             -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='2.5' width='19' height='19' rx='5'/%3E%3Cline x1='8.5' y1='2.5' x2='8.5' y2='21.5'/%3E%3Cpolyline points='16.5 8.5 12.5 12 16.5 15.5'/%3E%3C/svg%3E") no-repeat center / contain !important;
             mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='2.5' width='19' height='19' rx='5'/%3E%3Cline x1='8.5' y1='2.5' x2='8.5' y2='21.5'/%3E%3Cpolyline points='16.5 8.5 12.5 12 16.5 15.5'/%3E%3C/svg%3E") no-repeat center / contain !important;
@@ -416,14 +454,14 @@ st.markdown("""
         }
 
         /* Open / Reopen button when sidebar is collapsed: Reference squircle with chevron pointing RIGHT > */
-        [data-testid="collapsedControl"] button::after,
-        [data-testid="stSidebarCollapsedControl"]::after {
+        div[data-testid="collapsedControl"] button::after {
             content: "" !important;
-            display: block !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
             width: 22px !important;
             height: 22px !important;
-            flex-shrink: 0 !important;
-            margin: auto !important;
             background-color: currentColor !important;
             -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='2.5' width='19' height='19' rx='5'/%3E%3Cline x1='8.5' y1='2.5' x2='8.5' y2='21.5'/%3E%3Cpolyline points='12.5 8.5 16.5 12 12.5 15.5'/%3E%3C/svg%3E") no-repeat center / contain !important;
             mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='2.5' width='19' height='19' rx='5'/%3E%3Cline x1='8.5' y1='2.5' x2='8.5' y2='21.5'/%3E%3Cpolyline points='12.5 8.5 16.5 12 12.5 15.5'/%3E%3C/svg%3E") no-repeat center / contain !important;
