@@ -12,20 +12,54 @@ from src.preprocessing import preprocess_fundus_image, transform, validate_fundu
 from src.model_inference import load_models, ExplanationEngine
 from src.contact import send_contact_message
 
-# Preloaded sample cases dictionary (Available for cloud demo users)
-SAMPLE_CASES = {
-    "Select a preloaded sample...": None,
-    "Normal Retina - Case 1 (002c21358ce6)": "sample_images/Normal Eyes/002c21358ce6.png",
-    "Normal Retina - Case 2 (005b95c28852)": "sample_images/Normal Eyes/005b95c28852.png",
-    "Normal Retina - Case 3 (0097f532ac9f)": "sample_images/Normal Eyes/0097f532ac9f.png",
-    "Normal Retina - Case 4 (00cc2b75cddd)": "sample_images/Normal Eyes/00cc2b75cddd.png",
-    "Normal Retina - Case 5 (00f6c1be5a33)": "sample_images/Normal Eyes/00f6c1be5a33.png",
-    "Diabetic Retinopathy - Case 1 (000c1434d8d7)": "sample_images/Diabetic Retinopathy/000c1434d8d7.png",
-    "Diabetic Retinopathy - Case 2 (001639a390f0)": "sample_images/Diabetic Retinopathy/001639a390f0.png",
-    "Diabetic Retinopathy - Case 3 (0024cdab0c1e)": "sample_images/Diabetic Retinopathy/0024cdab0c1e.png",
-    "Diabetic Retinopathy - Case 4 (0083ee8054ee)": "sample_images/Diabetic Retinopathy/0083ee8054ee.png",
-    "Diabetic Retinopathy - Case 5 (00a8624548a9)": "sample_images/Diabetic Retinopathy/00a8624548a9.png",
+# Authentic clinical cases dictionaries (Sourced from dataset)
+ORIGINAL_NORMAL_CASES = {
+    "Case 1 (002c21358ce6)": "sample_images/Normal Eyes/002c21358ce6.png",
+    "Case 2 (005b95c28852)": "sample_images/Normal Eyes/005b95c28852.png",
+    "Case 3 (0097f532ac9f)": "sample_images/Normal Eyes/0097f532ac9f.png",
+    "Case 4 (00cc2b75cddd)": "sample_images/Normal Eyes/00cc2b75cddd.png",
+    "Case 5 (00f6c1be5a33)": "sample_images/Normal Eyes/00f6c1be5a33.png",
+    "Case 6 (0125fbd2e791)": "sample_images/Normal Eyes/0125fbd2e791.png",
 }
+
+ORIGINAL_DR_CASES = {
+    "Case 1 (000c1434d8d7)": "sample_images/Diabetic Retinopathy/000c1434d8d7.png",
+    "Case 2 (001639a390f0)": "sample_images/Diabetic Retinopathy/001639a390f0.png",
+    "Case 3 (0024cdab0c1e)": "sample_images/Diabetic Retinopathy/0024cdab0c1e.png",
+    "Case 4 (0083ee8054ee)": "sample_images/Diabetic Retinopathy/0083ee8054ee.png",
+    "Case 5 (00a8624548a9)": "sample_images/Diabetic Retinopathy/00a8624548a9.png",
+    "Case 6 (00b74780d31d)": "sample_images/Diabetic Retinopathy/00b74780d31d.png",
+}
+
+# Modal dialog for browsing real fundus images
+if hasattr(st, "dialog"):
+    @st.dialog("🖼️ Select Clinical Fundus Case", width="large")
+    def show_sample_gallery_dialog(category_name, cases_dict):
+        st.markdown(f"### {category_name}")
+        st.markdown("Below are authentic, high-resolution retinal fundus photography cases. Click **Select Case** on any image to initiate immediate diagnostics:")
+        st.markdown("---")
+        
+        cols = st.columns(3)
+        for idx, (label, rel_path) in enumerate(cases_dict.items()):
+            full_path = os.path.join(os.path.dirname(__file__), rel_path)
+            col = cols[idx % 3]
+            with col:
+                with st.container(border=True):
+                    if os.path.exists(full_path):
+                        img = Image.open(full_path)
+                        st.image(img, use_container_width=True)
+                        st.markdown(f"**{label}**")
+                        file_mb = os.path.getsize(full_path) / (1024 * 1024)
+                        st.caption(f"📏 {img.size[0]}×{img.size[1]}px | 💾 {file_mb:.1f} MB")
+                    if st.button("✅ Select Case", key=f"btn_modal_{category_name}_{idx}", use_container_width=True, type="primary"):
+                        st.session_state.selected_sample_path = full_path
+                        st.session_state.selected_sample_label = f"{category_name} - {label}"
+                        st.session_state.trigger_modal_open = False
+                        st.rerun()
+else:
+    def show_sample_gallery_dialog(category_name, cases_dict):
+        st.session_state.fallback_gallery_open = True
+
 
 #---------------Streamlit UI Page Settings---------------------------------------------
 st.set_page_config(
@@ -144,23 +178,67 @@ with st.sidebar:
             except Exception as e:
                 validation_error = f"Failed to parse image file: {str(e)}"
     else:
-        st.markdown("<span style='font-size:0.8rem; color:#64748B;'>Select a curated case to test without uploading:</span>", unsafe_allow_html=True)
-        sample_choice = st.selectbox(
-            "Select a preloaded case",
-            list(SAMPLE_CASES.keys()),
+        st.markdown("<span style='font-size:0.8rem; color:#64748B; font-weight:600;'>SELECT CLINICAL CATEGORY:</span>", unsafe_allow_html=True)
+        sample_category = st.radio(
+            "Category",
+            ["🟢 Normal Retina Cases", "🔴 Diabetic Retinopathy Cases"],
+            label_visibility="collapsed",
+            key="sample_cat_radio"
+        )
+        
+        current_cases = ORIGINAL_NORMAL_CASES if "Normal" in sample_category else ORIGINAL_DR_CASES
+        
+        # Check if category changed to trigger popup modal
+        if "last_sample_category" not in st.session_state:
+            st.session_state.last_sample_category = sample_category
+            st.session_state.trigger_modal_open = True
+        elif st.session_state.last_sample_category != sample_category:
+            st.session_state.last_sample_category = sample_category
+            st.session_state.trigger_modal_open = True
+            st.session_state.selected_sample_path = None
+            st.session_state.selected_sample_label = None
+
+        open_popup_btn = st.button("🖼️ Browse Real Images (Popup)", use_container_width=True, type="primary")
+        
+        # Automatically trigger dialog when category is chosen or button clicked
+        if open_popup_btn or st.session_state.get("trigger_modal_open", False):
+            st.session_state.trigger_modal_open = False
+            show_sample_gallery_dialog(sample_category, current_cases)
+
+        # Quick selector dropdown as well
+        case_options = ["-- Browse in Popup or Select --"] + list(current_cases.keys())
+        default_idx = 0
+        if st.session_state.get("selected_sample_label"):
+            for idx, opt in enumerate(case_options):
+                if opt in st.session_state.selected_sample_label:
+                    default_idx = idx
+                    break
+                    
+        case_choice = st.selectbox(
+            "Quick Select Case",
+            case_options,
+            index=default_idx,
             label_visibility="collapsed"
         )
-        if sample_choice != "Select a preloaded sample...":
-            sample_rel_path = SAMPLE_CASES[sample_choice]
-            sample_path = os.path.join(os.path.dirname(__file__), sample_rel_path)
+        
+        if case_choice != "-- Browse in Popup or Select --":
+            rel_path = current_cases[case_choice]
+            st.session_state.selected_sample_path = os.path.join(os.path.dirname(__file__), rel_path)
+            st.session_state.selected_sample_label = f"{sample_category} - {case_choice}"
+            
+        if st.session_state.get("selected_sample_path"):
+            sample_path = st.session_state.selected_sample_path
             if os.path.exists(sample_path):
                 try:
                     active_image = Image.open(sample_path).convert("RGB")
-                    active_source_label = sample_choice
+                    active_source_label = st.session_state.selected_sample_label
+                    
+                    # Preview thumbnail in sidebar
+                    st.image(active_image, caption=f"Active: {os.path.basename(sample_path)}", use_container_width=True)
                     
                     with open(sample_path, "rb") as f:
                         st.download_button(
-                            label="📥 Download This Sample File",
+                            label="📥 Download Original Raw File",
                             data=f.read(),
                             file_name=os.path.basename(sample_path),
                             mime="image/png",
@@ -292,9 +370,27 @@ if active_image is None:
                 "Supports visual confirmation with saliency maps (Grad-CAM) to highlight model focus, and superpixel analysis (LIME) to define features."
             )
             
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    st.info("💡 **Don't have a retinal photo?** Select **'🖼️ Preloaded Sample Cases'** in the sidebar to test Normal and Diabetic Retinopathy cases instantly!")
-    st.success("👈 Upload an image or choose a preloaded sample in the sidebar to initialize diagnostics.")
+    st.markdown("<br>", unsafe_allow_html=True)
+    if input_mode == "🖼️ Preloaded Sample Cases":
+        st.markdown(
+            """
+            <div style="border: 2px dashed rgba(128,128,128,0.25); border-radius: 12px; padding: 20px; text-align: center; background-color: rgba(128,128,128,0.02); margin-bottom: 20px;">
+                <h4 style="margin: 0 0 8px 0;">🖼️ Explore Authentic Clinical Cases</h4>
+                <p style="margin: 0 0 16px 0; color: #64748B; font-size: 0.9rem;">Click a category below to open the real fundus photography selection window:</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        col_w1, col_w2 = st.columns(2)
+        with col_w1:
+            if st.button("🟢 Browse Normal Retina Cases (Popup)", use_container_width=True, type="primary", key="btn_w_norm"):
+                show_sample_gallery_dialog("🟢 Normal Retina Cases", ORIGINAL_NORMAL_CASES)
+        with col_w2:
+            if st.button("🔴 Browse Diabetic Retinopathy Cases (Popup)", use_container_width=True, type="primary", key="btn_w_dr"):
+                show_sample_gallery_dialog("🔴 Diabetic Retinopathy Cases", ORIGINAL_DR_CASES)
+    else:
+        st.info("💡 **Don't have a retinal photo?** Select **'🖼️ Preloaded Sample Cases'** in the sidebar to test Normal and Diabetic Retinopathy cases instantly!")
+        st.success("👈 Upload a retinal fundus image in the sidebar panel to initialize diagnostics.")
 
 # UI STATE 2: Medical Report Screen (Image Uploaded or Sample Selected)
 else:
