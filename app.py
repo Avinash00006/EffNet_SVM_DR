@@ -420,7 +420,13 @@ st.markdown("""
         footer,
         div[data-testid="stDecoration"],
         #stDecoration,
-        div[data-testid="InputInstructions"] {
+        div[data-testid="InputInstructions"],
+        [data-testid="stHeaderActionElements"],
+        .stHeadingActionElements,
+        a[data-testid="stHeaderAction"],
+        a.anchor-link,
+        [data-testid="stHeadingWithActionElements"] a,
+        h1 a, h2 a, h3 a, h4 a {
             display: none !important;
             visibility: hidden !important;
             opacity: 0 !important;
@@ -1194,7 +1200,7 @@ if active_image is None:
                 <span style="width: 7px; height: 7px; border-radius: 50%; background-color: #34D399; display: inline-block;"></span>
                 <span>CLINICAL WORKSTATION READY</span>
             </div>
-            <h2 style="font-size: 1.25rem; font-weight: 800; color: #FFFFFF !important; margin: 2px 0 4px 0; letter-spacing: -0.02em;">Good Day, Clinician</h2>
+            <div style="font-size: 1.25rem; font-weight: 800; color: #FFFFFF !important; margin: 2px 0 4px 0; letter-spacing: -0.02em; line-height: 1.2;">Good Day, Clinician</div>
             <p style="color: rgba(255, 255, 255, 0.94) !important; font-size: 0.82rem; line-height: 1.45; margin: 0; max-width: 680px;">
                 Welcome to <b>RetinaAI Care</b> workstation. Automated ophthalmic fundus screening powered by hybrid EfficientNetV2-S deep feature extraction, Support Vector Machines, and Explainable AI (Grad-CAM & LIME).
             </p>
