@@ -34,80 +34,68 @@ ORIGINAL_DR_CASES = {
 # Modal dialog for browsing real fundus images
 # Modal dialogs for browsing real fundus images and contacting developer
 if hasattr(st, "dialog"):
-    @st.dialog("🖼️ Select Clinical Case", width="large")
+    @st.dialog("🖼️ Select Clinical Case", width="small")
     def show_sample_gallery_dialog(category_name, cases_dict):
         st.markdown(
             f"""
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;">
-                <div style="font-size: 1.10rem; font-weight: 800; color: #0F172A !important; letter-spacing: -0.01em;">{category_name}</div>
-                <div style="font-size: 0.70rem; font-weight: 700; color: #2B59ED !important; background: #EEF2FF; border: 1px solid #C7D2FE; padding: 2px 8px; border-radius: 12px;">6 REAL CASES</div>
-            </div>
-            <div style="font-size: 0.78rem; font-weight: 500; color: #475569 !important; margin-bottom: 14px; line-height: 1.4;">
-                Click directly on any retinal photography case below to load and run automated diagnostic analysis:
-            </div>
+            <div style="font-size: 1.0rem; font-weight: 800; color: #FFFFFF !important; margin-bottom: 2px;">{category_name}</div>
+            <div style="font-size: 0.74rem; font-weight: 500; color: #94A3B8 !important; margin-bottom: 12px;">Click any retinal image below to load and analyze:</div>
             """,
             unsafe_allow_html=True
         )
         
-        # Grid CSS & Direct-Click Card Styling
+        # Grid CSS: Half-ratio compact window, pure image tiles, zero wasted white space
         st.markdown("""
         <style>
-            /* Modal Surface - Clean Light Clinical Styling with High Contrast */
+            /* Modal Surface - Compact Half Ratio (380px) */
             div[data-testid="stDialog"] div[role="dialog"],
             div[data-baseweb="modal"] div[role="dialog"],
             div[data-testid="stModal"] div[role="dialog"],
             div[role="dialog"] {
-                max-width: 660px !important;
+                max-width: 380px !important;
                 width: 92vw !important;
-                background-color: #FFFFFF !important;
+                background-color: #131722 !important;
                 border-radius: 16px !important;
-                border: 1px solid #CBD5E1 !important;
-                box-shadow: 0 20px 50px rgba(15, 23, 42, 0.22) !important;
-                padding: 16px 20px !important;
+                border: 1px solid #334155 !important;
+                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5) !important;
+                padding: 14px 16px !important;
             }
             div[data-testid="stDialog"] div[role="dialog"] > div,
             div[data-baseweb="modal"] div[role="dialog"] > div,
             div[data-testid="stModal"] div[role="dialog"] > div,
             div[role="dialog"] > div {
-                background-color: #FFFFFF !important;
+                background-color: #131722 !important;
             }
             div[data-testid="stDialog"] h2,
             div[data-testid="stDialog"] [data-testid="stHeadingWithActionElements"] h2,
             div[role="dialog"] h2,
             div[role="dialog"] [data-testid="stHeadingWithActionElements"] h2 {
-                color: #0F172A !important;
-                font-size: 1.15rem !important;
+                color: #FFFFFF !important;
+                font-size: 1.05rem !important;
                 font-weight: 800 !important;
             }
             div[role="dialog"] button[aria-label="Close"],
             div[data-testid="stDialog"] button[aria-label="Close"] svg {
-                color: #475569 !important;
-                fill: #475569 !important;
+                color: #94A3B8 !important;
+                fill: #94A3B8 !important;
             }
 
-            /* 2x3 Grid Column Cards */
+            /* Zero Wasted Space - Pure Image Tile Container */
             div[data-testid="stDialog"] div[data-testid="stColumn"],
             div[data-baseweb="modal"] div[data-testid="stColumn"],
             div[role="dialog"] div[data-testid="stColumn"] {
                 position: relative !important;
-                border: 2px solid #CBD5E1 !important;
-                border-radius: 14px !important;
-                padding: 10px 8px 12px 8px !important;
+                background: transparent !important;
+                background-color: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 3px !important;
+                margin: 0 !important;
                 text-align: center !important;
-                transition: all 0.2s ease-in-out !important;
-                background-color: #FFFFFF !important;
                 cursor: pointer !important;
-                box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08) !important;
-            }
-            div[data-testid="stDialog"] div[data-testid="stColumn"]:hover,
-            div[data-baseweb="modal"] div[data-testid="stColumn"]:hover,
-            div[role="dialog"] div[data-testid="stColumn"]:hover {
-                border-color: #2B59ED !important;
-                transform: translateY(-2px) !important;
-                box-shadow: 0 8px 24px rgba(43, 89, 237, 0.22) !important;
             }
 
-            /* Neutralize intermediate wrappers so button stretches across entire stColumn */
+            /* Neutralize intermediate wrappers */
             div[data-testid="stDialog"] div[data-testid="stColumn"] div[data-testid="stVerticalBlock"],
             div[data-testid="stDialog"] div[data-testid="stColumn"] div[data-testid="stVerticalBlockBorderWrapper"],
             div[data-testid="stDialog"] div[data-testid="stColumn"] div[data-testid="stElementContainer"],
@@ -121,7 +109,7 @@ if hasattr(st, "dialog"):
                 background-color: transparent !important;
             }
 
-            /* Fundus image thumbnail: Perfectly centered */
+            /* Fundus image thumbnail: Perfectly fills column tile, zero wasted space */
             div[data-testid="stDialog"] div[data-testid="stColumn"] [data-testid="stImage"],
             div[data-baseweb="modal"] div[data-testid="stColumn"] [data-testid="stImage"],
             div[role="dialog"] div[data-testid="stColumn"] [data-testid="stImage"] {
@@ -129,68 +117,36 @@ if hasattr(st, "dialog"):
                 align-items: center !important;
                 justify-content: center !important;
                 width: 100% !important;
-                margin: 0 auto 6px auto !important;
+                margin: 0 auto !important;
                 pointer-events: none !important;
             }
             div[data-testid="stDialog"] div[data-testid="stColumn"] img,
             div[data-baseweb="modal"] div[data-testid="stColumn"] img,
             div[role="dialog"] div[data-testid="stColumn"] img {
-                max-height: 105px !important;
-                height: 105px !important;
-                width: auto !important;
-                margin: 0 auto !important;
-                display: block !important;
-                border-radius: 10px !important;
+                width: 100px !important;
+                height: 100px !important;
+                max-width: 100px !important;
+                max-height: 100px !important;
+                aspect-ratio: 1 / 1 !important;
                 object-fit: cover !important;
-                border: 1px solid #CBD5E1 !important;
+                border-radius: 12px !important;
+                border: 2px solid #334155 !important;
+                transition: all 0.2s ease-in-out !important;
+                display: block !important;
+                margin: 0 auto !important;
                 pointer-events: none !important;
                 user-select: none !important;
                 -webkit-user-select: none !important;
             }
-
-            /* FORCE 100% VISIBLE CRISP DARK TEXT IN SAMPLE CARDS */
-            div[data-testid="stDialog"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"],
-            div[data-testid="stDialog"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"] *,
-            div[data-testid="stDialog"] div[data-testid="stColumn"] p,
-            div[data-testid="stDialog"] div[data-testid="stColumn"] span,
-            div[data-testid="stDialog"] div[data-testid="stColumn"] div,
-            div[data-baseweb="modal"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"],
-            div[data-baseweb="modal"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"] *,
-            div[data-baseweb="modal"] div[data-testid="stColumn"] p,
-            div[data-baseweb="modal"] div[data-testid="stColumn"] span,
-            div[data-baseweb="modal"] div[data-testid="stColumn"] div,
-            div[role="dialog"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"],
-            div[role="dialog"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"] *,
-            div[role="dialog"] div[data-testid="stColumn"] p,
-            div[role="dialog"] div[data-testid="stColumn"] span,
-            div[role="dialog"] div[data-testid="stColumn"] div {
-                color: #0F172A !important;
-                opacity: 1 !important;
+            div[data-testid="stDialog"] div[data-testid="stColumn"]:hover img,
+            div[data-baseweb="modal"] div[data-testid="stColumn"]:hover img,
+            div[role="dialog"] div[data-testid="stColumn"]:hover img {
+                border-color: #3B82F6 !important;
+                transform: scale(1.05) !important;
+                box-shadow: 0 4px 16px rgba(59, 130, 246, 0.45) !important;
             }
 
-            /* Custom hash color */
-            div[role="dialog"] div[data-testid="stColumn"] .sample-case-hash,
-            div[data-baseweb="modal"] div[data-testid="stColumn"] .sample-case-hash,
-            div[data-testid="stDialog"] div[data-testid="stColumn"] .sample-case-hash {
-                color: #475569 !important;
-                font-family: monospace !important;
-                font-weight: 600 !important;
-            }
-
-            /* Custom action badge */
-            div[role="dialog"] div[data-testid="stColumn"] .sample-select-badge,
-            div[data-baseweb="modal"] div[data-testid="stColumn"] .sample-select-badge,
-            div[data-testid="stDialog"] div[data-testid="stColumn"] .sample-select-badge {
-                color: #1D4ED8 !important;
-                background-color: #DBEAFE !important;
-                border: 1px solid #93C5FD !important;
-                border-radius: 6px !important;
-                padding: 3px 8px !important;
-                font-weight: 700 !important;
-                display: inline-block !important;
-            }
-
-            /* Text labels container */
+            /* Case label directly below image */
             div[data-testid="stDialog"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"],
             div[data-baseweb="modal"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"],
             div[role="dialog"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"] {
@@ -201,9 +157,17 @@ if hasattr(st, "dialog"):
                 -webkit-user-select: none !important;
                 width: 100% !important;
                 text-align: center !important;
+                margin-top: 3px !important;
+            }
+            div[data-testid="stDialog"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"] *,
+            div[data-baseweb="modal"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"] *,
+            div[role="dialog"] div[data-testid="stColumn"] [data-testid="stMarkdownContainer"] * {
+                color: #F1F5F9 !important;
+                font-size: 0.78rem !important;
+                font-weight: 700 !important;
             }
 
-            /* Streamlit button overlay spans entire column with pure transparent background */
+            /* Direct-Click Invisible Overlay spanning 100% of the image tile */
             div[data-testid="stDialog"] div[data-testid="stColumn"] div.stButton,
             div[data-testid="stDialog"] div[data-testid="stColumn"] div[data-testid="stButton"],
             div[data-baseweb="modal"] div[data-testid="stColumn"] div.stButton,
@@ -264,25 +228,14 @@ if hasattr(st, "dialog"):
                 global_idx = row_idx + col_idx
                 full_path = os.path.join(os.path.dirname(__file__), rel_path)
                 
-                if " (" in label:
-                    short_name = label.split(" (")[0]
-                    case_hash = label.split(" (")[1].replace(")", "")
-                else:
-                    short_name = label
-                    case_hash = ""
+                short_name = label.split(" (")[0] if " (" in label else label
                     
                 with cols[col_idx]:
                     if os.path.exists(full_path):
                         img = Image.open(full_path)
                         st.image(img, use_container_width=True)
                         st.markdown(
-                            f"""
-                            <div style='text-align: center; margin-top: 6px; pointer-events: none;'>
-                                <div style='font-size: 0.92rem; font-weight: 800; color: #0F172A !important; line-height: 1.2;'>{short_name}</div>
-                                <div class='sample-case-hash' style='font-size: 0.68rem; font-weight: 600; color: #475569 !important; margin: 3px 0 5px 0;'>ID: {case_hash[:8]}...</div>
-                                <div class='sample-select-badge'>👆 Click to Select</div>
-                            </div>
-                            """,
+                            f"<div style='text-align: center; margin-top: 3px;'><span style='font-size: 0.78rem; font-weight: 700; color: #F1F5F9 !important;'>{short_name}</span></div>",
                             unsafe_allow_html=True
                         )
                     
@@ -295,7 +248,7 @@ if hasattr(st, "dialog"):
                         st.rerun()
 
             if row_idx == 0:
-                st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+                st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
 
     @st.dialog("✉️ Contact Developer", width="small")
     def show_contact_dialog():
@@ -432,9 +385,9 @@ st.markdown("""
         section[data-testid="stSidebar"],
         [data-testid="stSidebar"],
         div[data-testid="stSidebarUserContent"] {
-            width: 280px !important;
+            width: 285px !important;
             min-width: 280px !important;
-            max-width: 285px !important;
+            max-width: 290px !important;
             background-color: #FFFFFF !important;
             border-right: 1px solid #E2E8F0 !important;
             box-shadow: 4px 0 16px rgba(43, 89, 237, 0.03) !important;
@@ -442,16 +395,16 @@ st.markdown("""
             overflow-x: hidden !important;
         }
         [data-testid="stSidebarContent"] {
-            padding-top: 1.4rem !important;
-            padding-bottom: 2.2rem !important;
-            padding-left: 1.15rem !important;
-            padding-right: 1.15rem !important;
+            padding-top: 2.0rem !important;
+            padding-bottom: 3.5rem !important;
+            padding-left: 1.30rem !important;
+            padding-right: 1.30rem !important;
             overflow-y: auto !important;
             overflow-x: hidden !important;
         }
         section[data-testid="stSidebar"]::-webkit-scrollbar,
         [data-testid="stSidebarContent"]::-webkit-scrollbar {
-            width: 5px !important;
+            width: 6px !important;
         }
         section[data-testid="stSidebar"]::-webkit-scrollbar-track,
         [data-testid="stSidebarContent"]::-webkit-scrollbar-track {
@@ -467,9 +420,9 @@ st.markdown("""
             background: #94A3B8 !important;
         }
         div[data-testid="stSidebar"] div.stButton button {
-            margin-bottom: 8px !important;
-            padding: 8px 12px !important;
-            font-size: 12.5px !important;
+            margin-bottom: 12px !important;
+            padding: 10px 14px !important;
+            font-size: 13px !important;
             font-weight: 700 !important;
             border-radius: 10px !important;
         }
@@ -478,18 +431,18 @@ st.markdown("""
         .medcare-sidebar-brand {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             background: linear-gradient(135deg, #2B59ED 0%, #3B71F7 100%);
-            padding: 8px 12px;
+            padding: 12px 14px;
             border-radius: 12px;
             color: #FFFFFF !important;
-            margin-bottom: 8px;
+            margin-bottom: 22px;
             box-shadow: 0 4px 14px rgba(43, 89, 237, 0.2);
         }
         .medcare-sidebar-brand h2 {
             color: #FFFFFF !important;
             margin: 0 !important;
-            font-size: 1.0rem !important;
+            font-size: 1.05rem !important;
             font-weight: 800 !important;
             letter-spacing: -0.02em;
             line-height: 1.1;
@@ -937,7 +890,7 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("<div style='font-size: 0.74rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.04em; margin: 14px 0 8px 0;'>📁 Fundus Input Source</div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size: 0.78rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.04em; margin: 26px 0 12px 0;'>📁 Fundus Input Source</div>", unsafe_allow_html=True)
     input_mode = st.radio(
         "Choose Input Source",
         ["📤 Upload Image", "🖼️ Preloaded Sample Cases"],
@@ -951,6 +904,7 @@ with st.sidebar:
     validation_error = None
     
     if input_mode == "📤 Upload Image":
+        st.markdown("<div style='margin-top: 14px;'></div>", unsafe_allow_html=True)
         uploaded_file = st.file_uploader(
             "Upload a retinal fundus image (.jpg, .jpeg, .png)",
             type=["jpg", "png", "jpeg"],
@@ -963,7 +917,7 @@ with st.sidebar:
             except Exception as e:
                 validation_error = f"Failed to parse image file: {str(e)}"
     else:
-        st.markdown("<div style='font-size: 0.74rem; color: #475569; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; margin: 16px 0 8px 0;'>🔬 Clinical Samples:</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size: 0.78rem; color: #475569; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; margin: 24px 0 12px 0;'>🔬 Clinical Samples:</div>", unsafe_allow_html=True)
         
         btn_normal = st.button("🟢 Normal Images", use_container_width=True, key="btn_side_norm")
         btn_dr = st.button("🔴 Diabetic Retinopathy Cases", use_container_width=True, key="btn_side_dr")
@@ -981,9 +935,9 @@ with st.sidebar:
                     active_source_label = st.session_state.selected_sample_label
                     
                     st.markdown("""
-                    <div style='background: #EEF2FF; border: 1.5px solid #C7D2FE; border-radius: 10px; padding: 8px 10px; margin-top: 10px;'>
+                    <div style='background: #EEF2FF; border: 1.5px solid #C7D2FE; border-radius: 10px; padding: 10px 12px; margin-top: 14px;'>
                         <div style='font-size: 0.68rem; font-weight: 800; color: #2B59ED; text-transform: uppercase; letter-spacing: 0.03em;'>ACTIVE CLINICAL CASE</div>
-                        <div style='font-size: 0.78rem; font-weight: 700; color: #1E293B; word-break: break-all; margin-top: 2px;'>""" + os.path.basename(sample_path) + """</div>
+                        <div style='font-size: 0.80rem; font-weight: 700; color: #1E293B; word-break: break-all; margin-top: 3px;'>""" + os.path.basename(sample_path) + """</div>
                     </div>
                     """, unsafe_allow_html=True)
                     if st.button("✕ Deselect Case", key="btn_reset_sample", use_container_width=True):
@@ -1001,13 +955,13 @@ with st.sidebar:
         if not is_valid:
             validation_error = validation_msg
             
-    st.markdown("<div style='border-top: 1.5px solid #E2E8F0; margin: 20px 0 16px 0;'></div>", unsafe_allow_html=True)
-    st.markdown("<div style='font-size: 0.74rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px;'>📬 Developer & Support</div>", unsafe_allow_html=True)
+    st.markdown("<div style='border-top: 1.5px solid #E2E8F0; margin: 34px 0 24px 0;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size: 0.78rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 12px;'>📬 Developer & Support</div>", unsafe_allow_html=True)
     
     # Custom HTML for social links (styled with clean, high-contrast badges)
     st.markdown(
         """
-        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+        <div style="display: flex; gap: 10px; margin-bottom: 16px;">
             <a href="https://github.com/Avinash00006" target="_blank" class="social-badge">
                 🐙 GitHub
             </a>
